@@ -215,6 +215,49 @@
     ui.popId = null; ui.popToday = false;
   }
 
+
+  // ---------- install hint ----------
+  var deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferredPrompt = e; render(); });
+  window.addEventListener('appinstalled', function () { deferredPrompt = null; toast('App installiert', 'Öffne Rituals ab jetzt über das Icon.'); render(); });
+  function installInfo() {
+    var ua = navigator.userAgent || '';
+    var ios = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    var android = /Android/i.test(ua);
+    var standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
+    var otherIosBrowser = ios && /CriOS|FxiOS|EdgiOS|OPiOS|GSA|Instagram|FBAN|FBAV|Line\//.test(ua);
+    return { ios: ios, android: android, standalone: standalone, otherIosBrowser: otherIosBrowser, canPrompt: !!deferredPrompt, mobile: ios || android };
+  }
+  function showInstall() {
+    var i = installInfo();
+    if (i.standalone) return false;
+    if (!i.mobile && !i.canPrompt) return false;
+    return true;
+  }
+  var SHARE_GLYPH = '<span class="glyph">' + svg('<path d="M12 3v12M8 7l4-4 4 4"/><path d="M6 11H5v10h14V11h-1"/>', 1.9) + '</span>';
+  var ADD_GLYPH = '<span class="glyph">' + svg('<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8v8M8 12h8"/>', 1.9) + '</span>';
+  function installSteps() {
+    var i = installInfo();
+    if (i.canPrompt) return '<button class="btn primary block" data-a="install">' + ICON.plus + 'Zum Home-Bildschirm hinzufügen</button>';
+    if (i.otherIosBrowser) return '<ol class="steps"><li><span class="n">1</span><span>Link kopieren und in <strong>Safari</strong> öffnen. Nur Safari kann Apps auf den Home-Bildschirm legen.</span></li></ol>';
+    if (i.ios) return '<ol class="steps">' +
+      '<li><span class="n">1</span><span>Unten in Safari auf <strong>Teilen</strong> ' + SHARE_GLYPH + ' tippen. Falls du es nicht siehst: erst auf <strong>•••</strong></span></li>' +
+      '<li><span class="n">2</span><span><strong>Zum Home-Bildschirm</strong> ' + ADD_GLYPH + ' wählen, eventuell weiter unten in der Liste</span></li>' +
+      '<li><span class="n">3</span><span>Auf <strong>Hinzufügen</strong> tippen und Rituals ab jetzt über das Icon öffnen</span></li></ol>';
+    return '<ol class="steps"><li><span class="n">1</span><span>Im Browser-Menü <strong>⋮</strong> auf <strong>App installieren</strong> oder <strong>Zum Startbildschirm hinzufügen</strong> tippen</span></li>' +
+      '<li><span class="n">2</span><span>Rituals ab jetzt über das Icon öffnen</span></li></ol>';
+  }
+  function installCard(compact) {
+    var i = installInfo();
+    var why = i.ios ? 'Dann läuft Rituals wie eine App, im Vollbild und offline, und kann dich erinnern. Wichtig: Safari und die App teilen ihre Daten nicht, also am besten vor dem ersten Check-in installieren.' : 'Dann läuft Rituals wie eine App, im Vollbild und offline, und kann dich erinnern.';
+    return '<section class="card install" aria-label="App installieren">' +
+      '<div class="row" style="gap:12px;align-items:flex-start"><span class="tile" style="background:var(--p);color:var(--onP)"><span style="width:20px;height:20px;display:inline-flex">' + svg('<rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/>') + '</span></span>' +
+      '<div class="stack" style="gap:2px;flex:1"><span class="eyebrow" style="font-size:11px;color:var(--pd)">' + (compact ? 'Noch nicht installiert' : 'Erster Schritt') + '</span><strong style="font-size:16px">Leg Rituals auf deinen Home-Bildschirm</strong></div>' +
+      (compact ? '<button class="btn ghost sm" data-a="install-later" aria-label="Hinweis ausblenden" style="color:var(--ink3);margin:-6px -8px 0 0">' + ICON.x + '</button>' : '') + '</div>' +
+      (compact ? '' : '<p class="small" style="color:var(--ink2)">' + why + '</p>') +
+      installSteps() + '</section>';
+  }
+
   // ---------- views ----------
   function vOnboarding() {
     var li = function (ic, t, s) { return '<li><span class="tile">' + ic + '</span><span class="stack" style="gap:2px"><strong>' + t + '</strong><span class="small muted">' + s + '</span></span></li>'; };
@@ -225,7 +268,8 @@
       li(ICON.cal, 'Rituale passend zur Saison', 'Fertige 30-Tage-Challenges, vom Spartober bis zum Winter Arc') +
       li(ICON.leaf, 'Monatsziele an einem Ort', 'Challenges und Erlebnisse für den Monat gemeinsam planen') +
       li(ICON.shield, 'Nachsichtig statt streng', 'Ein verpasster Tag wirft dich nicht zurück') + '</ul>' +
-      '<div class="stack"><button class="btn primary block" data-a="ob-lib">Erstes Ritual auswählen</button>' +
+      (showInstall() ? installCard(false) + '<p class="eyebrow" style="margin-top:4px">Danach</p>' : '') +
+      '<div class="stack"><button class="btn ' + (showInstall() ? '' : 'primary ') + 'block" data-a="ob-lib">Erstes Ritual auswählen</button>' +
       '<button class="btn block" data-a="ob-sample">Mit Beispieldaten ausprobieren</button>' +
       '<p class="xs muted">Beispieldaten: drei laufende Challenges ab Monatsanfang, zwei geplante für nächsten Monat, Monatsziele und zwei Langzeit-Zähler. Ohne erfundene Check-ins.</p></div>' +
       '</section>';
@@ -241,6 +285,7 @@
     var md = state.months[monthKey(t)];
     var h = topbar(brand(), active.length ? '<button class="icon-btn" data-a="go" data-v="teilen" aria-label="Tag teilen">' + ICON.share + '</button>' : '');
     h += '<header class="stack" style="gap:2px">' + eyebrow(WD_LONG[d.getDay()] + ', ' + d.getDate() + '. ' + MONTHS[d.getMonth()]) + '<h1>' + (all ? 'Gut gemacht.' : 'Heute') + '</h1></header>';
+    if (showInstall() && !(state.settings.installHideUntil && state.settings.installHideUntil > Date.now())) h += installCard(true);
     if (state.sample) h += '<p class="xs" style="color:var(--rt);font-weight:700">Beispieldaten geladen. Abhaken, ändern und löschen funktioniert echt.</p>';
 
     // hero
@@ -666,6 +711,8 @@
     'set-theme': function (v) { state.settings.theme = v; applyTheme(); commit(); },
     reminder: function () { if (state.settings.reminder) { state.settings.reminder = false; save(); syncReminderTags(); render(); } else enableReminder(); },
     'test-notify': testNotify,
+    install: function () { if (!deferredPrompt) return; deferredPrompt.prompt(); deferredPrompt.userChoice.then(function () { deferredPrompt = null; render(); }); },
+    'install-later': function () { state.settings.installHideUntil = Date.now() + 3 * 864e5; commit(); toast('Hinweis ausgeblendet', 'Er kommt in drei Tagen wieder, solange die App nicht installiert ist.'); },
     'ob-lib': function () { state.onboarded = true; save(); go('bibliothek'); },
     'ob-sample': function () { state = sampleData(); applyTheme(); save(); toast('Beispieldaten geladen', 'Du kannst alles echt abhaken und ändern.'); go('heute'); },
     toggle: function (id) { var b = snapshot(), ch = findCh(id), t = today(), was = isDone(ch, t); setCi(ch, t, { done: !was }); if (!was) ui.popId = id; save(); checkMilestone(b); render(); },
