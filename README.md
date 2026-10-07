@@ -35,7 +35,12 @@ Die App speichert die gewählte Uhrzeit als Tag `reminder_time` bei OneSignal. D
 
 ## Updates ausrollen
 
-Nach Änderungen an den Dateien in `sw.js` die Zeile `var VERSION = 'ikigai-rituals-v1';` hochzählen (v2, v3 …). Sonst zeigen installierte Geräte eventuell noch die alte Version.
+Nach Änderungen an den Dateien in `sw.js` zwei Zeilen anpassen:
+
+- `var VERSION = 'ikigai-rituals-v9';` hochzählen (v10, v11 …). Daran erkennt die App ein Update.
+- `var LABEL = '0.9';` ist die Versionsnummer, die in Profil › Einstellungen › App angezeigt wird.
+
+Die installierte App prüft beim Öffnen und alle 30 Minuten, ob es eine neue Version gibt, und zeigt dann oben „Neue Version verfügbar · Aktualisieren“. Unter Profil › Einstellungen › App kann man auch selbst nach Updates suchen. Die Daten bleiben dabei erhalten.
 
 ## Dateien
 
