@@ -186,7 +186,7 @@
     var tabs = [['heute', 'Heute', 'sun'], ['monat', 'Monat', 'cal'], ['bibliothek', 'Bibliothek', 'lib'], ['profil', 'Profil', 'user']];
     var main = { heute: 'heute', monat: 'monat', bibliothek: 'bibliothek', profil: 'profil', einstellungen: 'profil', setup: 'bibliothek', detail: ui.back === 'monat' ? 'monat' : 'heute', rueckblick: 'heute', teilen: 'heute' }[ui.view];
     document.getElementById('tabs').innerHTML = tabs.map(function (t) {
-      return '<button class="tab" data-a="go" data-v="' + t[0] + '"' + (main === t[0] ? ' aria-current="page"' : '') + '><span class="pill">' + t[2] + '</span>' + t[1] + '</button>';
+      return '<button class="tab" data-a="go" data-v="' + t[0] + '"' + (main === t[0] ? ' aria-current="page"' : '') + '><span class="pill">' + ICON[main === t[0] ? t[2] + 'Fill' : t[2]] + '</span>' + t[1] + '</button>';
     }).join('');
     document.getElementById('tabbar').hidden = ui.view === 'onboarding';
   }
