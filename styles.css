@@ -277,3 +277,37 @@ input[type="date"]::-webkit-calendar-picker-indicator { opacity: .6; }
 .ymark { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--ink2); font-variant-numeric: tabular-nums; }
 .ymark::before { content: ""; flex-shrink: 0; width: 9px; height: 9px; border-radius: 1px; transform: rotate(45deg); background: var(--ink3); }
 .ymark.fresh::before { width: 10px; height: 10px; border-radius: 5px; transform: none; background: var(--r); }
+
+/* Bibliothek: Umschalter Challenges / Wissen */
+.seg { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; padding: 4px; border-radius: 14px; background: var(--surf2); }
+.seg button { min-height: 40px; border: none; border-radius: 11px; background: transparent; font-size: 14px; font-weight: 700; color: var(--ink3); cursor: pointer; }
+.seg button[aria-selected="true"] { background: var(--surf); color: var(--ink); box-shadow: var(--shadow); }
+:root[data-theme="dark"] .seg button[aria-selected="true"] { background: var(--line2); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .seg button[aria-selected="true"] { background: var(--line2); } }
+
+/* Rückblick */
+.q { font-size: 17px; font-weight: 700; font-family: var(--f-body); margin: 0; }
+.rates { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.rate { height: 52px; border-radius: 26px; border: 1px solid var(--line2); background: var(--bg); font-size: 17px; font-weight: 700; color: var(--ink2); cursor: pointer; padding: 0; font-variant-numeric: tabular-nums; }
+.rate[aria-pressed="true"] { background: var(--p); border-color: var(--p); color: var(--onP); }
+.card.vorsatz { border: 1.5px solid var(--p); }
+.quote { font-family: var(--f-display); font-size: 24px; font-weight: 600; line-height: 1.2; }
+.card.ink { background: var(--ink); border-color: var(--ink); color: var(--bg); box-shadow: none; }
+.card.ink .eyebrow { color: var(--open); }
+.tb-entry { cursor: pointer; text-align: left; color: inherit; gap: 8px; align-items: flex-start; }
+.rdots { display: inline-flex; gap: 4px; }
+.rdot { width: 8px; height: 8px; border-radius: 4px; background: var(--line2); }
+.rdot.on { background: var(--p); }
+
+/* Wissen */
+.art-row { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 64px; padding: 10px 0; border: none; border-top: 1px solid var(--line); background: none; color: inherit; cursor: pointer; }
+.art-row:first-child { border-top: none; }
+.acards { gap: 10px; }
+.acard { width: 220px; flex-shrink: 0; gap: 8px; align-items: flex-start; text-align: left; cursor: pointer; color: inherit; }
+.art-body p { font-size: 16px; line-height: 1.6; color: var(--ink2); }
+.art-body .rule { font-size: 15px; color: var(--ink2); }
+.n-badge { width: 28px; height: 28px; border-radius: 14px; background: var(--ink); color: var(--bg); font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+.src { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; font-size: 13px; line-height: 1.45; }
+.src a { color: var(--p); }
+.impuls { cursor: pointer; text-align: left; color: inherit; gap: 8px; }
+.impuls-t { font-family: var(--f-display); font-size: 22px; font-weight: 600; line-height: 1.2; color: var(--ink); }

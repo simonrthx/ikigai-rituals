@@ -83,6 +83,85 @@
   ];
   var CATS = ['Fitness', 'Gesundheit', 'Ernährung', 'Mindset', 'Kreativität', 'Lernen', 'Natur', 'Finanzen', 'Selfcare', 'Routine', 'Lifestyle', 'Fun'];
 
+  // ---------- Rückblick: feste Auswahl, damit Muster erkennbar werden ----------
+  var HELPED = ['Feste Uhrzeit', 'Erinnerung', 'Kleine Schritte', 'Mit jemandem zusammen', 'Tracker sichtbar', 'Vorbereitung am Vorabend', 'Belohnung'];
+  var HARD = ['Wochenende', 'Zu ambitioniert', 'Vergessen', 'Unterwegs', 'Keine Zeit', 'Motivation weg', 'Krank'];
+
+  // ---------- Wissen ----------
+  var SRC = {
+    lally: { t: 'Lally, van Jaarsveld, Potts & Wardle (2010): How are habits formed: Modelling habit formation in the real world. European Journal of Social Psychology', u: 'https://doi.org/10.1002/ejsp.674' },
+    goll99: { t: 'Gollwitzer (1999): Implementation intentions: Strong effects of simple plans. American Psychologist', u: 'https://doi.org/10.1037/0003-066X.54.7.493' },
+    goll06: { t: 'Gollwitzer & Sheeran (2006): Implementation intentions and goal achievement: A meta-analysis of effects and processes. Advances in Experimental Social Psychology', u: 'https://doi.org/10.1016/S0065-2601(06)38002-1' },
+    watson: { t: 'Watson et al. (2015): Recommended amount of sleep for a healthy adult. Sleep', u: 'https://doi.org/10.5665/sleep.4716' },
+    chang: { t: 'Chang et al. (2015): Evening use of light-emitting eReaders negatively affects sleep, circadian timing, and next-morning alertness. PNAS', u: 'https://doi.org/10.1073/pnas.1418490112' },
+    buijze: { t: 'Buijze et al. (2016): The effect of cold showering on health and work: A randomized controlled trial. PLOS ONE', u: 'https://doi.org/10.1371/journal.pone.0161749' },
+    hunt: { t: 'Hunt, Marx, Lipson & Young (2018): No more FOMO: Limiting social media decreases loneliness and depression. Journal of Social and Clinical Psychology', u: 'https://doi.org/10.1521/jscp.2018.37.10.751' },
+    who: { t: 'Bull et al. (2020): World Health Organization 2020 guidelines on physical activity and sedentary behaviour. British Journal of Sports Medicine', u: 'https://doi.org/10.1136/bjsports-2020-102955' },
+    paluch: { t: 'Paluch et al. (2022): Daily steps and all-cause mortality: a meta-analysis of 15 international cohorts. The Lancet Public Health', u: 'https://doi.org/10.1016/S2468-2667(21)00302-9' },
+    goyal: { t: 'Goyal et al. (2014): Meditation programs for psychological stress and well-being. JAMA Internal Medicine', u: 'https://doi.org/10.1001/jamainternmed.2013.13018' },
+    emmons: { t: 'Emmons & McCullough (2003): Counting blessings versus burdens. Journal of Personality and Social Psychology', u: 'https://doi.org/10.1037/0022-3514.84.2.377' }
+  };
+  var TOPICS = { Grundlagen: 'blue', Schlaf: 'violet', Bewegung: 'orange', Gesundheit: 'red', Achtsamkeit: 'green', Digital: 'grey' };
+  var ARTICLES = [
+    { id: 'gewohnheiten', title: 'Wie Gewohnheiten entstehen', topic: 'Grundlagen', min: 4, tpls: [],
+      summary: 'Gewohnheiten entstehen durch Wiederholung im selben Zusammenhang. In einer Studie dauerte es im Mittel 66 Tage, bis ein neues Verhalten automatisch lief, mit großen Unterschieden zwischen den Personen.',
+      why: ['In der Studie von Lally und Kollegen wählten 96 Freiwillige ein neues Verhalten, zum Beispiel ein Glas Wasser zum Frühstück oder 15 Minuten Laufen, und machten es täglich im selben Zusammenhang.', 'Bis sich das Verhalten weitgehend automatisch anfühlte, vergingen im Mittel 66 Tage. Die Spanne reichte von 18 bis 254 Tagen. Einfache Handlungen wurden schneller zur Gewohnheit als aufwendige.', '30 Tage sind deshalb ein guter Anfang, aber oft nicht das Ende. Danach lohnt sich eine Verlängerung oder eine zweite Runde.'],
+      steps: ['Hänge das neue Verhalten an etwas, das du schon jeden Tag tust, zum Beispiel an das Zähneputzen.', 'Fang kleiner an, als du denkst. So klein, dass es auch an einem schlechten Tag geht.', 'Mach es möglichst zur gleichen Zeit und am gleichen Ort.'],
+      pitfalls: ['Zu viel auf einmal: lieber eine Challenge sauber als drei halb.', 'Kein fester Auslöser: Ohne Wann und Wo bleibt es vom Zufall abhängig.'],
+      src: ['lally'] },
+    { id: 'wenndann', title: 'Wenn-dann-Pläne', topic: 'Grundlagen', min: 3, tpls: [],
+      summary: 'Ein Plan in der Form „Wenn Situation X eintritt, dann mache ich Y“ hilft, Vorsätze tatsächlich umzusetzen. In der Psychologie heißt das Durchführungsintention.',
+      why: ['Der Psychologe Peter Gollwitzer hat untersucht, warum gute Vorsätze oft scheitern: Im entscheidenden Moment fehlt die Entscheidung, was genau zu tun ist.', 'Eine Übersichtsarbeit über 94 Studien fand, dass Menschen mit solchen Wenn-dann-Plänen ihre Ziele deutlich häufiger erreichten als Menschen, die sich nur das Ziel vornahmen. Der Effekt war mittel bis groß.'],
+      steps: ['Schreib deinen Vorsatz als Satz: „Wenn ich abends nach Hause komme, dann lege ich das Handy in die Küche.“', 'Plane auch das Hindernis: „Wenn ich am Wochenende keine Lust habe, dann mache ich nur die Mini-Version.“', 'Formuliere den Vorsatz aus deinem letzten Rückblick als Wenn-dann-Satz.'],
+      pitfalls: ['Zu vage: „Mehr bewegen“ ist kein Plan, „Nach dem Mittagessen 10 Minuten gehen“ schon.'],
+      src: ['goll99', 'goll06'] },
+    { id: 'fehltag', title: 'Ein verpasster Tag ist kein Rückfall', topic: 'Grundlagen', min: 2, tpls: [],
+      summary: 'Einen Tag auszulassen hat in der Forschung zur Gewohnheitsbildung den Prozess kaum beeinflusst. Entscheidend ist, schnell wieder einzusteigen.',
+      why: ['In der Studie von Lally und Kollegen wirkte sich eine einzelne verpasste Gelegenheit nicht wesentlich auf die Gewohnheitsbildung aus.', 'Gefährlicher als der verpasste Tag ist der Gedanke „Jetzt ist es eh egal“. Deshalb gibt es in Rituals den nachsichtigen Modus und den Streak-Schutz.'],
+      steps: ['Nie zweimal hintereinander auslassen: Am Tag danach zählt nur, wieder anzufangen.', 'Mach an schweren Tagen die kleinste Version, zum Beispiel eine Minute statt zehn.', 'Schreib in die Tagesnotiz, was dich rausgebracht hat. Das hilft dir beim Rückblick.'],
+      pitfalls: ['Nach einem Fehltag alles neu starten. Im nachsichtigen Modus läuft die Challenge einfach weiter.'],
+      src: ['lally'] },
+    { id: 'schlaf', title: 'Früher schlafen: warum es wirkt', topic: 'Schlaf', min: 4, tpls: ['schlaf', 'digital'],
+      summary: 'Erwachsenen werden regelmäßig 7 Stunden Schlaf oder mehr empfohlen. Helles Bildschirmlicht am späten Abend kann das Einschlafen verzögern.',
+      why: ['Die amerikanischen Fachgesellschaften für Schlafmedizin und Schlafforschung empfehlen Erwachsenen regelmäßig mindestens 7 Stunden Schlaf pro Nacht.', 'In einer Studie lasen Teilnehmende vor dem Schlafen entweder auf einem leuchtenden E-Reader oder in einem gedruckten Buch. Mit dem E-Reader schliefen sie später ein, schütteten später Melatonin aus und waren am nächsten Morgen weniger wach.'],
+      steps: ['Rechne von deiner Weckzeit 7,5 Stunden zurück. Das ist deine Zielzeit fürs Licht aus.', 'Stell dir 30 Minuten vor der Zielzeit einen Wecker als Signal fürs Runterfahren.', 'Lies in der letzten halben Stunde auf Papier statt auf dem Bildschirm.'],
+      pitfalls: ['Am Wochenende viel später ins Bett: Das verschiebt den Rhythmus für Montag.', 'Im Bett noch scrollen: Lade das Handy außerhalb des Schlafzimmers.'],
+      src: ['watson', 'chang'] },
+    { id: 'kalt', title: 'Kalt duschen: was die Studienlage sagt', topic: 'Gesundheit', min: 3, tpls: ['kaltduschen'],
+      summary: 'In einer großen Studie meldeten sich Menschen, die ihre warme Dusche kalt beendeten, seltener krank bei der Arbeit. Krank fühlten sie sich aber nicht seltener.',
+      why: ['In einer randomisierten Studie aus den Niederlanden mit rund 3.000 Teilnehmenden beendeten die Gruppen ihre warme Dusche 30 Tage lang mit 30, 60 oder 90 Sekunden kaltem Wasser.', 'Die Kaltduscher meldeten sich um 29 Prozent seltener krank. Die Zahl der Tage, an denen sie sich krank fühlten, unterschied sich aber nicht von der Kontrollgruppe. Ob 30 oder 90 Sekunden, machte kaum einen Unterschied.', 'Viele Teilnehmende berichteten außerdem von mehr Energie. Das beruht auf Selbstauskünften.'],
+      steps: ['Starte mit 15 bis 30 Sekunden kalt am Ende der normalen Dusche.', 'Atme ruhig und langsam aus, statt die Luft anzuhalten.', 'Steigere erst, wenn es sich normal anfühlt. Länger hat in der Studie nicht mehr gebracht.'],
+      pitfalls: ['Bei Herz-Kreislauf-Erkrankungen vorher ärztlich abklären.', 'Gleich mit Minuten starten und nach drei Tagen aufgeben.'],
+      src: ['buijze'] },
+    { id: 'social', title: 'Weniger Social Media', topic: 'Digital', min: 3, tpls: ['socialpause', 'digital'],
+      summary: 'Wer seine Social-Media-Zeit begrenzt, fühlt sich in Studien oft weniger einsam. Es muss nicht gleich der komplette Verzicht sein.',
+      why: ['In einer Studie der University of Pennsylvania begrenzten Studierende Facebook, Instagram und Snapchat drei Wochen lang auf je 10 Minuten am Tag.', 'Im Vergleich zur Kontrollgruppe gingen Einsamkeit und depressive Symptome zurück, vor allem bei denen, die vorher stärker belastet waren.'],
+      steps: ['Nimm die Apps für die Dauer der Challenge vom Startbildschirm, zum Beispiel in einen Ordner auf der letzten Seite.', 'Stell in den Bildschirmzeit-Einstellungen ein Tageslimit ein.', 'Plane, was du stattdessen tust, zum Beispiel lesen oder kurz rausgehen.'],
+      pitfalls: ['Langeweile als Zeichen des Scheiterns sehen. Sie gehört am Anfang dazu.'],
+      src: ['hunt'] },
+    { id: 'bewegung', title: 'Wie viel Bewegung braucht man?', topic: 'Bewegung', min: 4, tpls: ['steps', 'spazieren', 'km60', 'run5k', 'bike30'],
+      summary: 'Die WHO empfiehlt Erwachsenen 150 bis 300 Minuten moderate Bewegung pro Woche. Bei Schritten zeigt die Forschung Vorteile auch schon unter 10.000.',
+      why: ['Die Weltgesundheitsorganisation empfiehlt Erwachsenen pro Woche 150 bis 300 Minuten moderate Bewegung wie zügiges Gehen oder 75 bis 150 Minuten intensive Bewegung. Jede Bewegung zählt, auch in kurzen Einheiten.', 'Eine Auswertung von 15 Studien mit rund 47.000 Erwachsenen fand: Mehr Schritte pro Tag gingen mit einem geringeren Sterberisiko einher. Bei unter 60-Jährigen flachte der Nutzen bei etwa 8.000 bis 10.000 Schritten ab, bei über 60-Jährigen bei etwa 6.000 bis 8.000.'],
+      steps: ['Ermittle eine Woche lang deinen Schnitt und setz dein Ziel etwa 1.000 bis 2.000 Schritte darüber.', 'Leg feste Gehzeiten fest, zum Beispiel nach dem Mittagessen.', '30 Minuten Gehen an fünf Tagen ergeben schon 150 Minuten pro Woche.'],
+      pitfalls: ['Alles am Abend nachholen wollen: Über den Tag verteilt ist es leichter durchzuhalten.'],
+      src: ['who', 'paluch'] },
+    { id: 'meditation', title: 'Meditation für Einsteiger', topic: 'Achtsamkeit', min: 3, tpls: ['meditation'],
+      summary: 'Eine große Übersichtsarbeit fand mäßige Belege dafür, dass Achtsamkeitsprogramme Angst, depressive Symptome und Schmerzen verringern können.',
+      why: ['Eine Übersichtsarbeit in JAMA Internal Medicine wertete 47 Studien mit rund 3.500 Teilnehmenden aus. Achtsamkeitsprogramme verbesserten Angst, depressive Symptome und Schmerzen in mäßigem Umfang.', 'Für Stress waren die Belege schwächer, für Stimmung, Aufmerksamkeit oder Schlaf unzureichend. Meditation ist also kein Wundermittel, aber für einige Bereiche gut untersucht.'],
+      steps: ['Fang mit 3 bis 5 Minuten an und steigere langsam.', 'Setz dich bequem hin und richte die Aufmerksamkeit auf den Atem. Wenn Gedanken kommen, kehr freundlich zurück.', 'Gleicher Ort, gleiche Zeit, zum Beispiel direkt nach dem Aufstehen.'],
+      pitfalls: ['Glauben, man müsse den Kopf leer bekommen. Das Zurückkehren ist die eigentliche Übung.'],
+      src: ['goyal'] },
+    { id: 'dank', title: 'Dankbarkeit aufschreiben', topic: 'Achtsamkeit', min: 3, tpls: ['dank', 'journal'],
+      summary: 'In Studien bewerteten Menschen, die regelmäßig aufschrieben, wofür sie dankbar sind, ihr Leben positiver als Vergleichsgruppen.',
+      why: ['In Experimenten von Robert Emmons und Michael McCullough notierten Teilnehmende über mehrere Wochen Dinge, für die sie dankbar waren. Andere Gruppen notierten Ärgernisse oder neutrale Ereignisse.', 'Die Dankbarkeitsgruppen bewerteten ihr Leben insgesamt positiver und blickten optimistischer auf die kommende Woche. Die Ergebnisse beruhen auf Selbstauskünften.'],
+      steps: ['Schreib jeden Abend drei Dinge auf, die heute gut waren.', 'Werde konkret: lieber „der Kaffee in der Sonne heute Mittag“ als „ein schöner Tag“.', 'Wenn es sich nach Pflicht anfühlt, mach es nur dreimal pro Woche.'],
+      pitfalls: ['Jeden Tag dieselben drei Dinge. Kleine, neue Beobachtungen wirken lebendiger.'],
+      src: ['emmons'] }
+  ];
+  function findArt(id) { for (var i = 0; i < ARTICLES.length; i++) if (ARTICLES[i].id === id) return ARTICLES[i]; return null; }
+  function tplIdByName(name) { for (var i = 0; i < TEMPLATES.length; i++) if (TEMPLATES[i].name === name) return TEMPLATES[i].id; return null; }
+  function artFor(name) { var id = tplIdByName(name); return id ? ARTICLES.filter(function (a) { return a.tpls.indexOf(id) >= 0; }) : []; }
+
   // ---------- dates ----------
   function pad(n) { return (n < 10 ? '0' : '') + n; }
   function ymd(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
@@ -226,7 +305,7 @@
 
   function renderTabs() {
     var tabs = [['heute', 'Heute', 'sun'], ['monat', 'Monat', 'cal'], ['bibliothek', 'Bibliothek', 'lib'], ['profil', 'Profil', 'user']];
-    var main = { heute: 'heute', monat: 'monat', bibliothek: 'bibliothek', profil: 'profil', einstellungen: 'profil', jahr: 'monat', setup: 'bibliothek', detail: ui.back === 'monat' ? 'monat' : 'heute', rueckblick: 'heute', teilen: 'heute' }[ui.view];
+    var main = { heute: 'heute', monat: 'monat', bibliothek: 'bibliothek', profil: 'profil', einstellungen: 'profil', jahr: 'monat', setup: 'bibliothek', detail: ui.back === 'monat' ? 'monat' : 'heute', rueckblick: ui.rvBack === 'tagebuch' ? 'profil' : 'heute', teilen: 'heute', tagebuch: 'profil', artikel: ui.artBack === 'heute' ? 'heute' : ui.artBack === 'detail' ? 'heute' : 'bibliothek' }[ui.view];
     document.getElementById('tabs').innerHTML = tabs.map(function (t) {
       return '<button class="tab" data-a="go" data-v="' + t[0] + '"' + (main === t[0] ? ' aria-current="page"' : '') + '><span class="pill">' + ICON[main === t[0] ? t[2] + 'Fill' : t[2]] + '</span>' + t[1] + '</button>';
     }).join('');
@@ -235,7 +314,7 @@
 
   function render() {
     if (!state.onboarded && state.challenges.length === 0 && ['bibliothek', 'setup', 'einstellungen'].indexOf(ui.view) < 0) ui.view = 'onboarding';
-    var views = { onboarding: vOnboarding, heute: vHeute, monat: vMonat, bibliothek: vBibliothek, setup: vSetup, detail: vDetail, rueckblick: vRueckblick, teilen: vTeilen, profil: vProfil, einstellungen: vEinstellungen };
+    var views = { onboarding: vOnboarding, heute: vHeute, monat: vMonat, bibliothek: vBibliothek, setup: vSetup, detail: vDetail, rueckblick: vRueckblick, teilen: vTeilen, profil: vProfil, einstellungen: vEinstellungen, tagebuch: vTagebuch, artikel: vArtikel };
     var keep = Array.prototype.map.call(document.querySelectorAll('.chips.scroll'), function (e) { return e.scrollLeft; }), sameView = render.last === ui.view;
     views.jahr = vJahr;
     document.getElementById('app').innerHTML = (views[ui.view] || vHeute)();
@@ -335,6 +414,7 @@
       '<div class="week">' + dots + '</div>' +
       '<div class="hero-foot"><span class="row" style="gap:6px;font-weight:600;color:var(--ink2)"><span style="width:16px;height:16px;display:inline-flex">' + ICON.shield + '</span>' + (st.freezeUsed ? 'Streak-Schutz diese Woche genutzt' : '1 Streak-Schutz verfügbar') + '</span><span class="muted num">Rekord: ' + st.best + '</span></div></section>';
 
+    h += impulsCard(t);
     var soon = upcoming(t, 21)[0]; if (soon) h += soonCard(soon, true);
     ended.forEach(function (ch) {
       h += '<section class="card warm"><div class="between"><div class="stack" style="gap:2px"><span class="eyebrow" style="color:var(--rt)">Zeitraum vorbei</span><strong>' + esc(ch.name) + '</strong></div><button class="btn sm warm" data-a="open-review" data-v="' + ch.id + '">Rückblick</button></div></section>';
@@ -519,7 +599,10 @@
   }
   function vBibliothek() {
     var t = today(), m = parse(t).getMonth() + 1, f = ui.lib, q = ui.q.trim().toLowerCase();
-    var h = topbar(eyebrow(TEMPLATES.length + ' Vorlagen'), '<button class="icon-btn" data-a="go" data-v="jahr" aria-label="Jahresplaner">' + ICON.calPlus + '</button>') + '<h1>Bibliothek</h1>';
+    var wk = ui.libTab === 'wissen';
+    var h = topbar(eyebrow(wk ? ARTICLES.length + ' Artikel' : TEMPLATES.length + ' Vorlagen'), '<button class="icon-btn" data-a="go" data-v="jahr" aria-label="Jahresplaner">' + ICON.calPlus + '</button>') + '<h1>Bibliothek</h1>';
+    h += '<div class="seg" role="tablist" aria-label="Bereich"><button role="tab" aria-selected="' + !wk + '" data-a="lib-tab" data-v="ch">Challenges</button><button role="tab" aria-selected="' + wk + '" data-a="lib-tab" data-v="wissen">Wissen</button></div>';
+    if (wk) return h + vWissen();
     if (ui.planFor) h += '<div class="card soft" style="flex-direction:row;align-items:center;gap:12px"><span class="small" style="flex:1;color:var(--pd)"><strong>Planen für ' + MONTHS[+ui.planFor.slice(5, 7) - 1] + ' ' + ui.planFor.slice(0, 4) + '</strong><br>Start am ' + fmtY(ui.planFor) + '</span><button class="btn ghost sm" data-a="plan-clear" aria-label="Planung abbrechen" style="color:var(--ink3)">' + ICON.x + '</button></div>';
     h += '<label class="search">' + ICON.search + '<span class="sr">Challenges durchsuchen</span><input type="search" id="lib-q" data-in="q" value="' + esc(ui.q) + '" placeholder="Challenge suchen"></label>';
     h += '<div class="chips scroll" id="lib-chips" role="group" aria-label="Filter">' + libChips() + '</div>';
@@ -552,6 +635,7 @@
     var end = addDays(f.start, (+f.days || 1) - 1);
     var h = topbar(backBtn(f.id ? 'Challenge' : 'Bibliothek', f.id ? 'detail' : 'bibliothek'));
     h += '<header class="stack" style="gap:4px">' + (f.fromTpl ? eyebrow('Vorlage · ' + esc(f.cat)) : '') + '<h1 style="font-size:38px">' + (f.id ? 'Anpassen' : 'Einrichten') + '</h1></header>';
+    h += vorsatzCard(f);
     h += '<form class="stack" data-f="setup" style="gap:14px">';
     h += '<section class="card"><label class="field">Name<input id="f-name" type="text" data-in="f" data-k="name" value="' + esc(f.name) + '" placeholder="z.B. Kalt duschen" required></label></section>';
     h += '<section class="card"><h2>Dauer</h2><div class="chips">' + [7, 21, 30, 66, 90].map(function (n) { return chip(n + ' Tage', 'f-days', n, +f.days === n); }).join('') + '</div>' +
@@ -614,6 +698,8 @@
     }
     h += '</section>';
     h += '<section class="card"><h2 style="font-size:22px">' + (ch.type === 'liste' ? 'Tages-Checkliste' : 'Regeln') + '</h2>' + (ch.rules.length ? '<div class="stack" style="gap:8px">' + ch.rules.map(function (r) { return '<span class="rule">' + esc(r) + '</span>'; }).join('') + '</div>' : '<p class="small muted">Keine Regeln hinterlegt.</p>') + '</section>';
+    var arts = artFor(ch.name);
+    if (arts.length) h += '<div class="section-head"><h2>Wissen</h2><button class="btn ghost sm" data-a="lib-wissen">Alle</button></div><section class="card" style="padding:4px 16px;gap:0">' + arts.map(artRow).join('') + '</section>';
     var notes = [], m = state.checkins[ch.id] || {}; Object.keys(m).sort().reverse().forEach(function (dd) { if (m[dd].note) notes.push([dd, m[dd].note]); });
     if (notes.length) h += '<section class="card"><h2 style="font-size:22px">Notizen</h2>' + notes.slice(0, 10).map(function (n) { return '<div class="stack" style="gap:2px;border-top:1px solid var(--line);padding-top:8px"><span class="xs muted num">' + fmtY(n[0]) + '</span><p class="share-pre">' + esc(n[1]) + '</p></div>'; }).join('') + '</section>';
     if (ui.confirm === 'stop-' + ch.id) {
@@ -622,30 +708,166 @@
       h += '<section class="card warm"><strong>' + esc(ch.name) + ' löschen?</strong><p class="small" style="color:var(--ink2)">Challenge und alle Check-ins werden entfernt.</p><div class="row"><button class="btn sm danger" data-a="delete" data-v="' + ch.id + '">Endgültig löschen</button><button class="btn sm" data-a="cancel">Abbrechen</button></div></section>';
     } else {
       h += '<div class="grid2"><button class="btn" data-a="edit" data-v="' + ch.id + '">Anpassen</button>' +
-        ((p === 'active' || p === 'planned') ? '<button class="btn" style="color:var(--rt)" data-a="ask" data-v="stop-' + ch.id + '">Beenden</button>' : '<button class="btn" data-a="open-review" data-v="' + ch.id + '">Rückblick</button>') + '</div>' +
+        ((p === 'active' || p === 'planned') ? '<button class="btn" style="color:var(--rt)" data-a="ask" data-v="stop-' + ch.id + '">Beenden</button>' : '<button class="btn" data-a="open-review" data-v="' + ch.id + '">' + (ch.review && ch.review.at ? 'Rückblick ansehen' : 'Rückblick schreiben') + '</button>') + '</div>' +
         '<button class="btn ghost danger" style="align-self:center" data-a="ask" data-v="del-' + ch.id + '">Challenge löschen</button>';
     }
     return h;
   }
 
+  // ---------- Rückblick, Tagebuch, Wissen ----------
+  function rv(ch) {
+    if (!ch.review) ch.review = { rating: 0, helped: [], hard: [], helpedNote: ch.learn || '', hardNote: '', next: '', showNext: true, at: null };
+    return ch.review;
+  }
+  function rvChips(ch, list, key, act) {
+    var r = rv(ch);
+    return '<div class="chips">' + list.map(function (x) { return chip(esc(x), act, ch.id + '|' + x, r[key].indexOf(x) >= 0); }).join('') + '</div>';
+  }
   function vRueckblick() {
     var ch = findCh(ui.detailId); if (!ch) { ui.view = 'heute'; return vHeute(); }
+    var r = rv(ch);
     var t = today(), end = chEnd(ch), upto = end < t ? end : t, dn = doneDays(ch, upto), span = Math.max(1, diff(ch.start, upto) + 1);
     var run = 0, best = 0; for (var d = ch.start; d <= upto; d = addDays(d, 1)) { if (isDone(ch, d)) { run++; best = Math.max(best, run); } else run = 0; }
     var vals = []; if (ch.type === 'zahl') { var m = state.checkins[ch.id] || {}; Object.keys(m).sort().forEach(function (x) { if (+m[x].value) vals.push(+m[x].value); }); }
     var rate = Math.round(dn / span * 100), C = 2 * Math.PI * 44;
-    var h = topbar(backBtn('Challenge', 'detail'));
-    h += '<header class="stack" style="gap:4px">' + eyebrow(ch.status === 'done' ? 'Abgeschlossen' : 'Rückblick') + '<h1 style="font-size:38px">' + esc(ch.name) + '</h1><p class="small muted num">' + ch.days + ' Tage · ' + fmt(ch.start) + ' bis ' + fmt(end) + '</p></header>';
+    var backTo = ui.rvBack || 'detail', backLbl = { tagebuch: 'Tagebuch', setup: 'Einrichten', heute: 'Heute', detail: 'Challenge' }[backTo] || 'Zurück';
+    var h = topbar(backBtn(backLbl, backTo));
+    var head = ch.status === 'stopped' ? 'Beendet' : (ch.status === 'done' || end < t) ? 'Challenge abgeschlossen' : 'Zwischenstand';
+    h += '<header class="stack" style="gap:4px">' + eyebrow(head) + '<h1 style="font-size:38px">' + esc(ch.name) + '</h1><p class="small muted num">' + ch.days + ' Tage · ' + fmt(ch.start) + ' bis ' + fmt(end) + '</p></header>';
     h += '<section class="card warm" style="flex-direction:row;align-items:center;gap:18px;border-radius:20px"><div class="ring" style="width:104px;height:104px"><svg width="104" height="104" viewBox="0 0 104 104" aria-hidden="true"><circle cx="52" cy="52" r="44" fill="none" stroke="var(--surf)" stroke-width="8"/><circle cx="52" cy="52" r="44" fill="none" stroke="var(--r)" stroke-width="8" stroke-linecap="round" stroke-dasharray="' + (C * rate / 100).toFixed(1) + ' ' + C.toFixed(1) + '"/></svg><span class="lbl" style="font-size:26px">' + rate + '<small>%</small></span></div>' +
       '<div class="stack" style="gap:4px"><span class="streak-title num">' + (ch.type === 'summe' ? sumTotal(ch) + ' ' + esc(ch.unit) : dn + ' von ' + span + ' Tagen') + '</span><span class="small" style="color:var(--ink2)">Längste Serie: ' + best + ' Tage</span></div></section>';
     if (vals.length) h += '<section class="card"><h2 style="font-size:22px">Entwicklung</h2><div class="grid2"><div class="stack" style="gap:2px"><span class="xs muted">Erster Wert</span><span class="big">' + vals[0] + ' ' + esc(ch.unit) + '</span></div><div class="stack" style="gap:2px"><span class="xs muted">Bester Wert</span><span class="big">' + Math.max.apply(null, vals) + ' ' + esc(ch.unit) + '</span></div></div></section>';
-    h += '<section class="card"><label class="field">Was nimmst du mit?<textarea id="learn-' + ch.id + '" data-in="ch-learn" data-v="' + ch.id + '" rows="3" placeholder="Was hat geholfen, was war schwer?">' + esc(ch.learn || '') + '</textarea></label></section>';
+
+    h += '<div class="section-head"><h2>Dein Rückblick</h2>' + (r.at ? '<span class="badge ok">Gespeichert</span>' : '<span class="small muted">2 Minuten</span>') + '</div>';
+    var rates = ''; for (var i = 1; i <= 5; i++) rates += '<button type="button" class="rate" aria-pressed="' + (r.rating === i) + '" aria-label="' + i + ' von 5" data-a="rv-rate" data-v="' + ch.id + '|' + i + '">' + i + '</button>';
+    h += '<section class="card"><h3 class="q">Wie lief\'s?</h3><div class="rates">' + rates + '</div><div class="between xs muted"><span>Zäh</span><span>Richtig gut</span></div></section>';
+    h += '<section class="card"><h3 class="q">Was hat geholfen?</h3>' + rvChips(ch, HELPED, 'helped', 'rv-help') +
+      '<label class="field">Notiz (optional)<textarea id="rv-hn-' + ch.id + '" data-in="rv" data-k="helpedNote" data-v="' + ch.id + '" rows="2" placeholder="Was genau hat funktioniert?">' + esc(r.helpedNote) + '</textarea></label></section>';
+    h += '<section class="card"><h3 class="q">Was war schwer?</h3>' + rvChips(ch, HARD, 'hard', 'rv-hard') +
+      '<label class="field">Notiz (optional)<textarea id="rv-hd-' + ch.id + '" data-in="rv" data-k="hardNote" data-v="' + ch.id + '" rows="2" placeholder="Was hat dich rausgebracht?">' + esc(r.hardNote) + '</textarea></label></section>';
+    h += '<section class="card vorsatz"><label class="field q" for="rv-nx-' + ch.id + '" style="color:var(--ink)">Nächstes Mal mache ich …</label><textarea id="rv-nx-' + ch.id + '" data-in="rv" data-k="next" data-v="' + ch.id + '" rows="2" placeholder="Ein konkreter Satz, z.B. „Für das Wochenende einen festen Plan machen“">' + esc(r.next) + '</textarea>' +
+      '<div class="setting" style="border:none;min-height:0"><span><strong style="font-size:14px">Beim nächsten Start zeigen</strong><span class="xs muted">Als Vorsatz, wenn du diese Challenge wieder startest</span></span><button type="button" class="switch" role="switch" aria-checked="' + (r.showNext !== false) + '" aria-label="Vorsatz beim nächsten Start zeigen" data-a="rv-show" data-v="' + ch.id + '"></button></div></section>';
+    h += '<button class="btn primary block" style="min-height:54px" data-a="rv-save" data-v="' + ch.id + '">' + (r.at ? 'Rückblick aktualisieren' : 'Rückblick speichern') + '</button>';
+    h += '<p class="xs muted" style="text-align:center">Bleibt nur auf deinem Gerät. Alle Rückblicke findest du im Profil unter Challenge-Tagebuch.</p>';
+
     h += '<div class="section-head"><h2>Wie geht es weiter?</h2></div><div class="stack">' +
-      '<button class="opt" aria-pressed="true" data-a="again" data-v="' + ch.id + '"><strong>Neue Runde starten</strong><span class="small muted">Gleiche Challenge ab heute, Ziel anpassbar</span></button>' +
+      '<button class="opt" aria-pressed="true" data-a="again" data-v="' + ch.id + '"><strong>Neue Runde starten</strong><span class="small muted">Gleiche Challenge ab heute, mit deinem Vorsatz</span></button>' +
       '<button class="opt" data-a="extend" data-v="' + ch.id + '"><strong>Um 30 Tage verlängern</strong><span class="small muted">Gleiche Regeln, der Verlauf läuft weiter</span></button>' +
       (ch.status !== 'done' ? '<button class="opt" data-a="finish" data-v="' + ch.id + '"><strong>Abschließen</strong><span class="small muted">Verschwindet von Heute, bleibt im Monat sichtbar</span></button>' : '') +
       '</div><button class="btn block" data-a="share-ch" data-v="' + ch.id + '">' + ICON.share + 'Ergebnis teilen</button>';
     return h;
+  }
+
+  function reviewed() { return state.challenges.filter(function (c) { return c.review && c.review.at; }).sort(function (a, b) { return a.review.at < b.review.at ? 1 : -1; }); }
+  function topOf(list, key) {
+    var cnt = {}; list.forEach(function (c) { (c.review[key] || []).forEach(function (x) { cnt[x] = (cnt[x] || 0) + 1; }); });
+    var best = null; Object.keys(cnt).forEach(function (k) { if (!best || cnt[k] > cnt[best]) best = k; });
+    return best && cnt[best] >= 2 ? [best, cnt[best]] : null;
+  }
+  function rateDots(n) { var s = ''; for (var i = 1; i <= 5; i++) s += '<span class="rdot' + (i <= n ? ' on' : '') + '"></span>'; return '<span class="rdots" aria-label="Bewertung ' + n + ' von 5">' + s + '</span>'; }
+  function vTagebuch() {
+    var all = reviewed(), f = ui.tbF || 'alle', t = today();
+    var isStopped = function (c) { return c.status === 'stopped'; };
+    var list = all.filter(function (c) { return f === 'alle' || (f === 'stop' ? isStopped(c) : !isStopped(c)); });
+    var h = topbar(backBtn('Profil', 'profil'));
+    h += '<header class="stack" style="gap:4px">' + eyebrow(all.length + (all.length === 1 ? ' Rückblick' : ' Rückblicke')) + '<h1 style="font-size:38px">Challenge-Tagebuch</h1></header>';
+    var th = topOf(all, 'helped'), tw = topOf(all, 'hard');
+    if (th || tw) {
+      h += '<section class="card ink"><span class="eyebrow">Dein Muster</span><p style="font-size:16px;line-height:1.5">' +
+        (th ? 'Am meisten hilft dir <strong>' + esc(th[0]) + '</strong> (' + th[1] + ' von ' + all.length + ').' : '') + (th && tw ? ' ' : '') +
+        (tw ? 'Schwer wird es oft durch <strong>' + esc(tw[0]) + '</strong> (' + tw[1] + ' von ' + all.length + ').' : '') + '</p></section>';
+    } else if (all.length) {
+      h += '<p class="small muted">Ab zwei Rückblicken zeigt dir die App hier, was dir wiederholt hilft und was dich ausbremst.</p>';
+    }
+    if (!all.length) {
+      return h + '<section class="card empty"><span class="ic-circle">' + ICON.trophy + '</span><h2>Noch keine Rückblicke</h2><p class="muted small">Wenn eine Challenge endet, schreibst du in zwei Minuten auf, was geholfen hat und was du nächstes Mal anders machst. Das landet hier.</p></section>';
+    }
+    var nStop = all.filter(isStopped).length;
+    h += '<div class="chips" role="group" aria-label="Filter">' + chip('Alle · ' + all.length, 'tb-f', 'alle', f === 'alle') + chip('Geschafft · ' + (all.length - nStop), 'tb-f', 'done', f === 'done') + chip('Abgebrochen · ' + nStop, 'tb-f', 'stop', f === 'stop') + '</div>';
+    h += list.map(function (c) {
+      var r = c.review, dn = doneDays(c, chEnd(c) < t ? chEnd(c) : t);
+      return '<button class="card tb-entry" data-a="open-review" data-v="' + c.id + '"><span class="between" style="width:100%"><strong style="font-size:16px">' + esc(c.name) + '</strong><span class="xs muted num">' + MONTHS[parse(r.at).getMonth()].slice(0, 3) + '. ' + r.at.slice(0, 4) + '</span></span>' +
+        '<span class="row" style="gap:10px">' + (r.rating ? rateDots(r.rating) : '') + '<span class="xs muted num">' + (isStopped(c) ? 'Beendet nach ' + Math.max(0, diff(c.start, r.at) + 1) + ' Tagen' : dn + ' / ' + c.days + ' Tage') + '</span></span>' +
+        (r.next ? '<span class="small" style="color:var(--ink2);line-height:1.45"><strong style="color:var(--ink)">Nächstes Mal:</strong> ' + esc(r.next) + '</span>' : '') + '</button>';
+    }).join('');
+    return h;
+  }
+
+  function vorsatzFor(f) {
+    if (f.id) return null;
+    var name = String(f.name || '').trim(); if (!name) return null;
+    return reviewed().filter(function (c) { return c.name === name && c.review.next && c.review.showNext !== false; })[0] || null;
+  }
+  function vorsatzCard(f) {
+    var p = vorsatzFor(f); if (!p) return '';
+    var r = p.review, on = f.rules.indexOf(r.next) >= 0, dn = doneDays(p, chEnd(p) < today() ? chEnd(p) : today());
+    return '<section class="card vorsatz"><span class="row" style="gap:8px;color:var(--p)"><span style="width:18px;height:18px;display:inline-flex">' + ICON.refresh + '</span><span class="eyebrow" style="color:var(--p)">Dein Vorsatz von letztem Mal</span></span>' +
+      '<p class="quote">„' + esc(r.next) + '“</p>' +
+      '<span class="xs muted num">' + MONTHS[parse(r.at).getMonth()].slice(0, 3) + '. ' + r.at.slice(0, 4) + ' · ' + dn + ' von ' + p.days + ' Tagen' + (r.hard.length ? ' · schwer: ' + esc(r.hard.slice(0, 2).join(', ')) : '') + '</span>' +
+      '<div class="list-item" style="border-top:1px solid var(--line);min-height:48px"><button type="button" class="box" aria-pressed="' + on + '" aria-label="Vorsatz als Regel übernehmen" data-a="f-vorsatz">' + (on ? ICON.check : '') + '</button><span class="small" style="flex:1">Als Regel übernehmen</span></div>' +
+      '<button type="button" class="btn ghost sm" style="align-self:flex-start;margin-left:-8px" data-a="open-review" data-v="' + p.id + '">Ganzen Rückblick ansehen</button></section>';
+  }
+
+  function artTile(a, size) { return '<span class="tile" style="' + (size ? 'width:' + size + 'px;height:' + size + 'px;' : '') + 'color:' + color(TOPICS[a.topic]) + '"><span style="width:20px;height:20px;display:inline-flex">' + ICON.lib + '</span></span>'; }
+  function artRow(a) {
+    return '<button class="art-row" data-a="art" data-v="' + a.id + '">' + artTile(a) + '<span class="stack" style="gap:2px;flex:1;min-width:0;text-align:left"><strong style="font-size:15px;line-height:1.3">' + esc(a.title) + '</strong><span class="xs muted">' + a.min + ' Min. · ' + esc(a.topic) + ' · ' + a.src.length + (a.src.length === 1 ? ' Quelle' : ' Quellen') + '</span></span><span style="width:18px;height:18px;display:inline-flex;color:var(--ink3)">' + ICON.next + '</span></button>';
+  }
+  function wList() {
+    var q = (ui.wq || '').trim().toLowerCase(), tp = ui.wTopic || '';
+    return ARTICLES.filter(function (a) {
+      if (q) return (a.title + ' ' + a.topic + ' ' + a.summary).toLowerCase().indexOf(q) >= 0;
+      return !tp || a.topic === tp;
+    });
+  }
+  function wResults() {
+    var l = wList(), q = (ui.wq || '').trim();
+    var h = '<div class="section-head"><h2>' + (q ? 'Suche' : ui.wTopic ? esc(ui.wTopic) : 'Alle Artikel') + '</h2><span class="small muted num">' + l.length + '</span></div>';
+    if (!l.length) return h + '<p class="muted small">Nichts gefunden.</p>';
+    return h + '<section class="card" style="padding:4px 16px;gap:0">' + l.map(artRow).join('') + '</section>';
+  }
+  function wTopics() { return chip('Alle', 'w-topic', '', !ui.wTopic) + Object.keys(TOPICS).map(function (k) { return chip(esc(k), 'w-topic', k, ui.wTopic === k); }).join(''); }
+  function vWissen() {
+    var t = today(), mine = [], seen = {};
+    activeList(t).forEach(function (c) { artFor(c.name).forEach(function (a) { if (!seen[a.id]) { seen[a.id] = 1; mine.push([a, c]); } }); });
+    var h = '<label class="search">' + ICON.search + '<span class="sr">Wissen durchsuchen</span><input type="search" id="w-q" data-in="wq" value="' + esc(ui.wq || '') + '" placeholder="Wissen durchsuchen"></label>';
+    if (mine.length) {
+      h += '<div class="section-head"><h2>Zu deinen Challenges</h2></div><div class="chips scroll acards">' + mine.map(function (x) {
+        return '<button class="card acard" data-a="art" data-v="' + x[0].id + '">' + artTile(x[0], 36) + '<strong style="font-size:15px;line-height:1.3">' + esc(x[0].title) + '</strong><span class="xs muted">' + x[0].min + ' Min. · ' + esc(x[1].name) + '</span></button>';
+      }).join('') + '</div>';
+    }
+    h += '<div class="chips scroll" id="w-chips" role="group" aria-label="Themen">' + wTopics() + '</div>';
+    h += '<div id="w-results" class="stack" style="gap:12px">' + wResults() + '</div>';
+    h += '<p class="xs muted">Kurz zusammengefasst und mit Quellen belegt. Ersetzt keine medizinische Beratung.</p>';
+    return h;
+  }
+  function vArtikel() {
+    var a = findArt(ui.artId); if (!a) { ui.view = 'bibliothek'; return vBibliothek(); }
+    var backTo = ui.artBack || 'bibliothek', backLbl = { bibliothek: 'Wissen', detail: 'Challenge', heute: 'Heute' }[backTo] || 'Zurück';
+    var h = topbar(backBtn(backLbl, backTo));
+    h += '<header class="stack" style="gap:8px">' + eyebrow(esc(a.topic)) + '<h1 style="font-size:38px">' + esc(a.title) + '</h1><p class="small muted">' + a.min + ' Min. Lesezeit · ' + a.src.length + (a.src.length === 1 ? ' Quelle' : ' Quellen') + '</p></header>';
+    h += '<section class="card soft"><span class="eyebrow" style="color:var(--pd)">Kurz gesagt</span><p style="font-size:16px;line-height:1.55">' + esc(a.summary) + '</p></section>';
+    h += '<section class="stack art-body"><h2>Warum es wirkt</h2>' + a.why.map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('') + '</section>';
+    h += '<section class="stack art-body"><h2>So startest du</h2>' + a.steps.map(function (s, i) { return '<div class="row" style="align-items:flex-start;gap:12px"><span class="n-badge">' + (i + 1) + '</span><p style="flex:1">' + esc(s) + '</p></div>'; }).join('') + '</section>';
+    h += '<section class="stack art-body"><h2>Typische Stolpersteine</h2>' + a.pitfalls.map(function (s) { return '<span class="rule">' + esc(s) + '</span>'; }).join('') + '</section>';
+    var tps = TEMPLATES.filter(function (x) { return a.tpls.indexOf(x.id) >= 0; }), running = libRunning();
+    if (tps.length) {
+      h += '<div class="section-head"><h2>Passende Challenges</h2></div><section class="card" style="padding:4px 16px;gap:0">' + tps.map(function (x) {
+        var r = running[x.name];
+        return '<div class="list-item"><span class="tile" style="width:36px;height:36px;font-size:18px;color:' + color(x.color) + '">' + initial(x.name) + '</span><span style="flex:1;min-width:0"><strong style="font-weight:600">' + esc(x.name) + '</strong><br><span class="xs muted">' + x.days + ' Tage</span></span>' +
+          (r ? '<button class="btn sm pill" data-a="open-detail" data-v="' + r.id + '">' + (r.p === 'active' ? 'Läuft' : 'Geplant') + '</button>' : '<button class="btn sm pill primary" data-a="tpl" data-v="' + x.id + '">Starten</button>') + '</div>';
+      }).join('') + '</section>';
+    }
+    h += '<section class="stack" style="gap:8px"><h2 style="font-size:22px">Quellen</h2><ol class="src">' + a.src.map(function (k) { var s = SRC[k]; return '<li><a href="' + s.u + '" target="_blank" rel="noopener">' + esc(s.t) + '</a></li>'; }).join('') + '</ol><p class="xs muted">Zusammenfassung der Studien in eigenen Worten. Ersetzt keine medizinische oder therapeutische Beratung.</p></section>';
+    return h;
+  }
+  function impulsCard(t) {
+    var act = activeList(t);
+    for (var i = 0; i < act.length; i++) {
+      var arts = artFor(act[i].name); if (!arts.length) continue;
+      var n = dayIndex(act[i], t), a = arts[(n - 1) % arts.length], tip = a.steps[(n - 1) % a.steps.length];
+      return '<button class="card soft impuls" data-a="art" data-v="' + a.id + '"><span class="eyebrow" style="color:var(--pd)">Impuls · Tag ' + n + ' · ' + esc(act[i].name) + '</span><span class="impuls-t">' + esc(tip) + '</span><span class="row" style="gap:4px;font-size:14px;font-weight:700;color:var(--p)">Mehr dazu · ' + a.min + ' Min.<span style="width:16px;height:16px;display:inline-flex">' + ICON.next + '</span></span></button>';
+    }
+    return '';
   }
 
   function shareText() {
@@ -702,6 +924,8 @@
       '<div class="card tight" style="gap:4px"><span class="flame" style="background:var(--ps);color:var(--pd)">' + ICON.trophy + '</span><span class="stat" style="font-size:28px;margin-top:4px">' + st.best + '</span><span class="xs muted">Tage längste Streak</span></div>' +
       '<div class="card tight"><span class="stat">' + totalCheckins() + '</span><span class="xs muted">Check-ins insgesamt</span></div><div class="card tight"><span class="stat">' + act + ' · ' + fin + '</span><span class="xs muted">Laufend · abgeschlossen</span></div></section>';
     h += '<p class="xs muted">Ein Tag zählt ab dem ersten Check-in. Pro Woche überbrückt ein Streak-Schutz einen verpassten Tag.</p>';
+    var nr = reviewed().length;
+    h += '<button class="card" style="flex-direction:row;align-items:center;gap:14px;cursor:pointer;text-align:left;color:inherit" data-a="go" data-v="tagebuch"><span class="tile"><span style="width:20px;height:20px;display:inline-flex">' + ICON.trophy + '</span></span><span class="stack" style="gap:2px;flex:1;min-width:0"><strong style="font-size:16px">Challenge-Tagebuch</strong><span class="xs muted">' + (nr ? nr + (nr === 1 ? ' Rückblick' : ' Rückblicke') + ' · was dir hilft' : 'Deine Rückblicke nach jeder Challenge') + '</span></span><span style="width:20px;height:20px;display:inline-flex;color:var(--ink3)">' + ICON.next + '</span></button>';
     h += '<div class="section-head"><h2>Langzeit-Zeiträume</h2></div><section class="card"><p class="xs muted">Erscheinen auf Heute als Tageszähler.</p><div>' + state.periods.map(function (p) {
       var n = Math.max(0, Math.min(diff(p.start, t) + 1, diff(p.start, p.end) + 1));
       return '<div class="list-item"><span style="flex:1"><strong>' + esc(p.name) + '</strong><br><span class="xs muted num">Tag ' + n + ' · ' + fmtY(p.start) + ' bis ' + fmtY(p.end) + '</span></span><button class="btn ghost sm" aria-label="' + esc(p.name) + ' löschen" data-a="period-del" data-v="' + p.id + '" style="color:var(--ink3)">' + ICON.x + '</button></div>';
@@ -818,7 +1042,23 @@
     'note-open': function (id) { ui.openNote[id] = true; render(); var el = document.getElementById('note-' + id); if (el) el.focus(); },
     'note-close': function (id) { ui.openNote[id] = false; render(); },
     'open-detail': function (id) { ui.detailId = id; ui.back = ui.view === 'monat' ? 'monat' : 'heute'; go('detail'); },
-    'open-review': function (id) { ui.detailId = id; go('rueckblick'); },
+    'open-review': function (id) { ui.rvBack = ['tagebuch', 'setup', 'heute'].indexOf(ui.view) >= 0 ? ui.view : 'detail'; ui.detailId = id; go('rueckblick'); },
+    'rv-rate': function (v) { var p = v.split('|'), r = rv(findCh(p[0])); r.rating = r.rating === +p[1] ? 0 : +p[1]; commit(); },
+    'rv-help': function (v) { var p = v.split('|'), r = rv(findCh(p[0])), i = r.helped.indexOf(p[1]); if (i >= 0) r.helped.splice(i, 1); else r.helped.push(p[1]); commit(); },
+    'rv-hard': function (v) { var p = v.split('|'), r = rv(findCh(p[0])), i = r.hard.indexOf(p[1]); if (i >= 0) r.hard.splice(i, 1); else r.hard.push(p[1]); commit(); },
+    'rv-show': function (id) { var r = rv(findCh(id)); r.showNext = r.showNext === false; commit(); },
+    'rv-save': function (id) { var ch = findCh(id), r = rv(ch), first = !r.at; r.at = today(); ch.learn = r.helpedNote; save(); toast(first ? 'Rückblick gespeichert' : 'Rückblick aktualisiert', r.next && r.showNext !== false ? 'Dein Vorsatz erscheint beim nächsten Start.' : 'Du findest ihn im Challenge-Tagebuch.'); render(); },
+    'tb-f': function (v) { ui.tbF = v; render(); },
+    art: function (id) { ui.artBack = ['detail', 'heute'].indexOf(ui.view) >= 0 ? ui.view : 'bibliothek'; ui.artId = id; go('artikel'); },
+    'lib-tab': function (v) { ui.libTab = v; render(); },
+    'lib-wissen': function () { ui.libTab = 'wissen'; ui.wTopic = ''; ui.wq = ''; go('bibliothek'); },
+    'w-topic': function (v) {
+      ui.wTopic = v; ui.wq = '';
+      var c = document.getElementById('w-chips'), r = document.getElementById('w-results'), q = document.getElementById('w-q');
+      if (!c || !r) { render(); return; }
+      var sl = c.scrollLeft; c.innerHTML = wTopics(); c.scrollLeft = sl; if (q) q.value = ''; r.innerHTML = wResults();
+    },
+    'f-vorsatz': function () { var p = vorsatzFor(ui.form); if (!p) return; var i = ui.form.rules.indexOf(p.review.next); if (i >= 0) ui.form.rules.splice(i, 1); else ui.form.rules.push(p.review.next); render(); },
     month: function (n) { ui.month = monthShift(ui.month, +n); render(); },
     'month-now': function () { ui.month = monthKey(today()); render(); },
     'plan-month': function () { var t = today(), k = ui.month; ui.planFor = k > monthKey(t) ? k + '-01' : null; go('bibliothek'); },
@@ -855,7 +1095,7 @@
     edit: function (id) { var ch = findCh(id); ui.form = { id: ch.id, name: ch.name, cat: ch.cat, type: ch.type, target: ch.target || '', unit: ch.unit || '', days: ch.days, start: ch.start, mode: ch.mode, rules: ch.rules.slice(), color: ch.color, fromTpl: null }; go('setup'); },
     ask: function (v) { ui.confirm = v; render(); },
     cancel: function () { ui.confirm = null; render(); },
-    stop: function (id) { findCh(id).status = 'stopped'; ui.confirm = null; save(); go('rueckblick'); },
+    stop: function (id) { findCh(id).status = 'stopped'; ui.confirm = null; ui.rvBack = 'detail'; save(); go('rueckblick'); },
     delete: function (id) { state.challenges = state.challenges.filter(function (c) { return c.id !== id; }); delete state.checkins[id]; ui.confirm = null; save(); toast('Challenge gelöscht'); go('heute'); },
     restart: function (id) { var ch = findCh(id); ch.start = today(); state.checkins[id] = {}; commit(); toast('Neu gestartet', 'Ab heute läuft eine neue Runde.'); },
     again: function (id) { var ch = findCh(id); ui.form = { id: null, name: ch.name, cat: ch.cat, type: ch.type, target: ch.target || '', unit: ch.unit || '', days: ch.days, start: today(), mode: ch.mode, rules: ch.rules.slice(), color: ch.color, fromTpl: ch.name }; if (ch.status !== 'done') ch.status = 'done'; save(); go('setup'); },
@@ -909,6 +1149,8 @@
       return;
     }
     if (k === 'share') { ui.share.text = v; return; }
+    if (k === 'wq') { ui.wq = v; var wr = document.getElementById('w-results'); if (wr) wr.innerHTML = wResults(); var wc = document.getElementById('w-chips'); if (wc) { var wsl = wc.scrollLeft; wc.innerHTML = wTopics(); wc.scrollLeft = wsl; } return; }
+    if (k === 'rv') { rv(findCh(el.getAttribute('data-v')))[el.getAttribute('data-k')] = v; clearTimeout(inputTimer); inputTimer = setTimeout(save, 400); return; }
     if (k === 'note') setCi(findCh(el.getAttribute('data-v')), today(), { note: v });
     else if (k === 'focus' || k === 'why' || k === 'highlight' || k === 'learn') monthData(ui.month)[k] = v;
     else if (k === 'ch-learn') findCh(el.getAttribute('data-v')).learn = v;
