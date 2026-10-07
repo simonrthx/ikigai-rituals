@@ -267,7 +267,7 @@
     var doneN = active.filter(function (c) { return doneToday(c, t); }).length;
     var all = active.length > 0 && doneN === active.length;
     var md = state.months[monthKey(t)];
-    var h = topbar(brand(), active.length ? '<button class="icon-btn" data-a="go" data-v="teilen" aria-label="Tag teilen">' + ICON.share + '</button>' : '');
+    var h = topbar(brand(), '<button class="icon-btn" data-a="go" data-v="teilen" aria-label="Tag teilen">' + ICON.share + '</button>');
     h += '<header class="stack" style="gap:2px">' + eyebrow(WD_LONG[d.getDay()] + ', ' + d.getDate() + '. ' + MONTHS[d.getMonth()]) + '<h1>' + (all ? 'Gut gemacht.' : 'Heute') + '</h1></header>';
     if (showInstall() && !(state.settings.installHideUntil && state.settings.installHideUntil > Date.now())) h += installCard(true);
     if (state.sample) h += '<p class="xs" style="color:var(--rt);font-weight:700">Beispieldaten geladen. Abhaken, ändern und löschen funktioniert echt.</p>';
@@ -359,7 +359,7 @@
     var list = state.challenges.filter(function (c) { return c.start <= me && chEnd(c) >= ms; }).sort(function (a, b) { return a.start < b.start ? -1 : 1; });
     var kind = k < cur ? 'past' : (k > cur ? 'future' : 'now');
     var mName = MONTHS[+k.slice(5) - 1];
-    var h = topbar(eyebrow(kind === 'now' ? 'Aktueller Monat' : kind === 'past' ? 'Vergangen' : 'Geplant'));
+    var h = topbar(eyebrow(kind === 'now' ? 'Aktueller Monat' : kind === 'past' ? 'Vergangen' : 'Geplant'), '<button class="icon-btn" data-a="share-month" aria-label="Monat teilen">' + ICON.share + '</button>');
     h += '<header class="stack" style="gap:6px"><div class="row"><button class="icon-btn" style="width:40px;height:40px" aria-label="Vorheriger Monat" data-a="month" data-v="-1">' + ICON.back + '</button>' +
       '<h1 style="flex:1;text-align:center;font-size:38px">' + mName + '</h1>' +
       '<button class="icon-btn" style="width:40px;height:40px" aria-label="Nächster Monat" data-a="month" data-v="1">' + ICON.next + '</button></div>' +
@@ -679,7 +679,7 @@
 
   // ---------- actions ----------
   function go(v) { ui.view = v; ui.confirm = null; ui.editDate = null; window.scrollTo(0, 0); render(); }
-  function openShare(o) { ui.share = Object.assign({ tpl: 'tag', score: true, tags: true, extra: false, text: null, back: ui.view }, o || {}); go('teilen'); }
+  function openShare(o) { ui.share = Object.assign({ tpl: activeList(today()).length ? 'tag' : 'monat', score: true, tags: true, extra: false, text: null, back: ui.view }, o || {}); go('teilen'); }
   function checkMilestone(before) {
     var t = today(), act = activeList(t), after = act.filter(function (c) { return doneToday(c, t); }).length;
     var wasSafe = before.safe, nowSafe = activeOn(t);
