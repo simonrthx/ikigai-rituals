@@ -169,7 +169,7 @@
   function chip(label, act, val, on, extra) { return '<button type="button" class="chip" aria-pressed="' + (on ? 'true' : 'false') + '" data-a="' + act + '" data-v="' + esc(val) + '"' + (extra || '') + '>' + label + '</button>'; }
   function isDark() { var th = state.settings.theme; return th === 'dark' || (th === 'system' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches); }
   function themeBtn() { var d = isDark(); return '<button class="icon-btn" data-a="theme" aria-label="' + (d ? 'Zum hellen Modus wechseln' : 'Zum dunklen Modus wechseln') + '">' + (d ? ICON.sun : ICON.moon) + '</button>'; }
-  function topbar(left, right) { return '<div class="topbar">' + left + '<div class="row" style="gap:8px">' + (right || '') + themeBtn() + '</div></div>'; }
+  function topbar(left, right) { return '<div class="topbar">' + left + '<div class="row" style="gap:8px">' + (right || '') + '</div></div>'; }
   function brand() { return '<span class="brand">' + SIGNET + '<span class="row" style="gap:6px;align-items:baseline"><span class="w1">IKIGAI</span><span class="w2">Rituals</span></span></span>'; }
   function eyebrow(t) { return '<p class="eyebrow num">' + t + '</p>'; }
   function backBtn(label, to) { return '<button class="back" data-a="go" data-v="' + to + '">' + ICON.back + esc(label) + '</button>'; }
