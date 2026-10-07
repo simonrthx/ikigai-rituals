@@ -253,3 +253,27 @@ input[type="date"]::-webkit-calendar-picker-indicator { opacity: .6; }
 /* update bar */
 .toast.update { z-index: 21; top: calc(10px + env(safe-area-inset-top, 0px)); bottom: auto; box-shadow: 0 12px 32px -12px rgba(0,0,0,.25); background: var(--surf); color: var(--ink); border: 1px solid var(--line); }
 .toast.update .sub { color: var(--ink3); opacity: 1; }
+
+/* Jahresplaner */
+.ylegend { display: flex; flex-wrap: wrap; gap: 8px 14px; font-size: 12px; color: var(--ink2); }
+.ylegend span { display: inline-flex; align-items: center; gap: 6px; }
+.lg { display: inline-block; width: 12px; height: 12px; border-radius: 4px; }
+.lg.run { background: var(--p); } .lg.plan { border: 2px solid var(--p); } .lg.sug { border: 1px dashed var(--ink3); }
+.lg.fresh { width: 10px; height: 10px; border-radius: 5px; background: var(--r); } .lg.mile { width: 9px; height: 9px; border-radius: 1px; transform: rotate(45deg); background: var(--ink3); }
+.yrow { display: flex; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.yrow:last-child { border-bottom: none; }
+.ymonth { width: 44px; flex-shrink: 0; display: flex; flex-direction: column; }
+.ymonth span { font-family: var(--f-display); font-size: 21px; font-weight: 600; line-height: 1; }
+.ymonth.now span { color: var(--p); }
+.ymonth small { font-size: 11px; color: var(--ink3); }
+.ychips { display: flex; flex-wrap: wrap; gap: 6px; }
+.ychip { font-size: 12px; font-weight: 700; padding: 6px 10px; border-radius: 8px; cursor: pointer; border: 1px solid transparent; background: none; color: var(--ink); min-height: 32px; display: inline-flex; align-items: center; gap: 4px; }
+.ychip.run { background: var(--p); color: var(--onP); }
+.ychip.plan { background: var(--ps); color: var(--pd); border-color: var(--p); }
+.ychip.past { background: var(--surf2); color: var(--ink3); }
+.ychip.sug { border: 1px dashed var(--ink3); color: var(--ink2); }
+.ychip.add { border: 1px dashed var(--line2); color: var(--ink3); padding: 6px 8px; }
+.ychip.add svg { width: 14px; height: 14px; }
+.ymark { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--ink2); font-variant-numeric: tabular-nums; }
+.ymark::before { content: ""; flex-shrink: 0; width: 9px; height: 9px; border-radius: 1px; transform: rotate(45deg); background: var(--ink3); }
+.ymark.fresh::before { width: 10px; height: 10px; border-radius: 5px; transform: none; background: var(--r); }

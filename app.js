@@ -20,26 +20,68 @@
   var WD = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
   var WD_LONG = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
 
+  // season: Monate, in denen die Vorlage passt (Start am 1. des ersten Monats). when: besondere Starttermine.
   var TEMPLATES = [
+    // Saisonal
+    { id: 'dryjan', name: 'Dry January', days: 31, cat: 'Gesundheit', type: 'jn', color: 'blue', season: [1], rules: ['Einen Monat keinen Alkohol'], note: 'Bekannte Aktion zum Jahresstart' },
+    { id: 'veganuary', name: 'Veganuary', days: 31, cat: 'Ernährung', type: 'jn', color: 'green', season: [1], rules: ['Einen Monat vegan essen'], note: 'Internationale Aktion im Januar' },
+    { id: 'yoga30', name: '30 Tage Yoga', days: 30, cat: 'Fitness', type: 'zahl', target: 15, unit: 'Min.', color: 'violet', season: [1], rules: ['Jeden Tag Yoga, auch kurz zählt'], note: 'Beliebter Neujahrs-Klassiker' },
+    { id: 'fasten', name: 'Fastenzeit · 7 Wochen ohne', days: 46, cat: 'Mindset', type: 'jn', color: 'violet', season: [2, 3], when: 'lent', rules: ['Bis Ostern bewusst auf eine Sache verzichten, z.B. Süßes, Alkohol oder Social Media'], note: 'Von Aschermittwoch bis Karsamstag' },
+    { id: 'autofasten', name: 'Autofasten', days: 46, cat: 'Natur', type: 'jn', color: 'green', season: [2, 3], when: 'lent', rules: ['Wege zu Fuß, mit Rad oder Bahn statt mit dem Auto'], note: 'Fastenzeit-Variante fürs Klima' },
+    { id: 'ausmisten', name: 'Frühjahrsputz · Ausmisten', days: 30, cat: 'Lifestyle', type: 'jn', color: 'grey', season: [3], rules: ['Jeden Tag einen Gegenstand aussortieren oder eine Ecke aufräumen'] },
+    { id: 'bike30', name: '30 Tage Radfahren', days: 30, cat: 'Fitness', type: 'jn', color: 'blue', season: [4], rules: ['Jeden Tag Rad fahren, egal wie kurz'], note: 'Inspiriert von „30 Days of Biking“ im April' },
+    { id: 'poem', name: 'Ein Gedicht pro Tag', days: 30, cat: 'Kreativität', type: 'jn', color: 'violet', season: [4], rules: ['Jeden Tag ein kurzes Gedicht schreiben'], note: 'Inspiriert vom Poetry Month im April' },
+    { id: 'stadtradeln', name: 'Stadtradeln', days: 21, cat: 'Natur', type: 'summe', target: 200, unit: 'km', color: 'green', season: [5, 6, 7, 8, 9], rules: ['21 Tage Radkilometer sammeln'], note: 'Zeitraum legt deine Kommune fest, Datum anpassen' },
+    { id: 'wild30', name: '30 Tage Natur', days: 30, cat: 'Natur', type: 'jn', color: 'green', season: [6], rules: ['Jeden Tag etwas draußen in der Natur erleben'], note: 'Inspiriert von „30 Days Wild“ im Juni' },
+    { id: 'plasticfree', name: 'Plastikfreier Juli', days: 31, cat: 'Natur', type: 'jn', color: 'green', season: [7], rules: ['Auf Einwegplastik verzichten'], note: 'Internationale Aktion im Juli' },
+    { id: 'lesesommer', name: 'Lesesommer', days: 31, cat: 'Lernen', type: 'zahl', target: 20, unit: 'Min.', color: 'orange', season: [8], rules: ['Jeden Tag lesen'] },
+    { id: 'septreset', name: 'September-Neustart', days: 30, cat: 'Routine', type: 'liste', color: 'blue', season: [9], rules: ['Feste Aufstehzeit', 'Bewegung', 'Wochenplan am Sonntag'] },
     { id: 'winterarc', name: 'Winter Arc', days: 90, cat: 'Fitness', type: 'liste', color: 'blue', season: [10, 11, 12], rules: ['Kein Junkfood', '2-3 L Wasser', '7-8 h Schlaf', 'Früh aufstehen', 'Training oder Laufen', '20 Min. lesen'] },
-    { id: 'spartober', name: 'Spartober', days: 30, cat: 'Finanzen', type: 'jn', color: 'red', season: [10], rules: ['Nichts online bestellen', 'Keine Kleidung', 'Nichts Unnötiges kaufen'] },
-    { id: 'inktober', name: 'Inktober', days: 31, cat: 'Kreativität', type: 'jn', color: 'violet', season: [10], rules: ['Jeden Tag eine Zeichnung'] },
+    { id: 'spartober', name: 'Spartober', days: 31, cat: 'Finanzen', type: 'jn', color: 'red', season: [10], rules: ['Nichts online bestellen', 'Keine Kleidung', 'Nichts Unnötiges kaufen'] },
+    { id: 'inktober', name: 'Inktober', days: 31, cat: 'Kreativität', type: 'jn', color: 'violet', season: [10], rules: ['Jeden Tag eine Zeichnung'], note: 'Zeichen-Challenge im Oktober' },
+    { id: 'soberoct', name: 'Sober October', days: 31, cat: 'Gesundheit', type: 'jn', color: 'blue', season: [10], rules: ['Einen Monat keinen Alkohol'] },
+    { id: 'noshave', name: 'No-Shave-November', days: 30, cat: 'Fun', type: 'jn', color: 'grey', season: [11], rules: ['Nicht rasieren'] },
+    { id: 'movember', name: 'Movember', days: 30, cat: 'Gesundheit', type: 'jn', color: 'grey', season: [11], rules: ['Schnurrbart wachsen lassen und über Männergesundheit sprechen'], note: 'Aktion für Männergesundheit' },
+    { id: 'selfcare', name: 'SelfCare November', days: 30, cat: 'Selfcare', type: 'jn', color: 'green', season: [11], rules: ['Jeden Tag etwas für dich tun'] },
+    { id: 'schreibmonat', name: 'Schreibmonat', days: 30, cat: 'Kreativität', type: 'summe', target: 50000, unit: 'Wörter', color: 'orange', season: [11], rules: ['Im November einen Roman-Entwurf schreiben'], note: 'In der Tradition des NaNoWriMo' },
+    { id: 'advent', name: 'Advent der guten Taten', days: 24, cat: 'Mindset', type: 'jn', color: 'red', season: [12], when: 'advent', rules: ['Jeden Tag bis Heiligabend eine kleine gute Tat'] },
+    { id: 'adventbewegt', name: 'Bewegter Advent', days: 24, cat: 'Fitness', type: 'zahl', target: 20, unit: 'Min.', color: 'red', season: [12], when: 'advent', rules: ['Jeden Tag bis Heiligabend bewegen'] },
+    // Zeitlos
     { id: 'writing', name: 'Writing Challenge', days: 30, cat: 'Kreativität', type: 'jn', color: 'orange', season: [], rules: ['Jeden Tag schreiben'] },
     { id: 'zeichnen', name: 'Zeichnen', days: 30, cat: 'Kreativität', type: 'woche', target: 3, color: 'violet', season: [], rules: ['Mehrmals pro Woche zeichnen'] },
-    { id: 'noshave', name: 'No-Shave-November', days: 30, cat: 'Fun', type: 'jn', color: 'grey', season: [11], rules: ['Nicht rasieren'] },
-    { id: 'selfcare', name: 'SelfCare November', days: 30, cat: 'Selfcare', type: 'jn', color: 'green', season: [11], rules: ['Jeden Tag etwas für dich tun'] },
-    { id: 'veganuary', name: 'Veganuary', days: 31, cat: 'Ernährung', type: 'jn', color: 'green', season: [1], rules: ['Vegan essen'] },
+    { id: 'foto', name: 'Ein Foto pro Tag', days: 30, cat: 'Kreativität', type: 'jn', color: 'orange', season: [], rules: ['Jeden Tag ein bewusstes Foto machen'] },
+    { id: 'instrument', name: 'Instrument üben', days: 30, cat: 'Kreativität', type: 'zahl', target: 15, unit: 'Min.', color: 'violet', season: [], rules: ['Jeden Tag üben'] },
     { id: 'plank', name: 'Plank-Challenge', days: 30, cat: 'Fitness', type: 'zahl', target: 60, unit: 'Sek.', color: 'orange', season: [], rules: ['Jeden Tag planken, Zeit eintragen'] },
     { id: 'wandsitzen', name: 'Wandsitzen', days: 30, cat: 'Fitness', type: 'zahl', target: 60, unit: 'Sek.', color: 'orange', season: [], rules: ['Jeden Tag Wandsitzen, Zeit eintragen'] },
+    { id: 'pushups', name: 'Liegestütze', days: 30, cat: 'Fitness', type: 'zahl', target: 50, unit: 'Wdh.', color: 'orange', season: [], rules: ['Liegestütze über den Tag verteilt'] },
+    { id: 'squats', name: 'Kniebeugen', days: 30, cat: 'Fitness', type: 'zahl', target: 100, unit: 'Wdh.', color: 'orange', season: [], rules: ['Kniebeugen über den Tag verteilt'] },
     { id: 'km60', name: '60 km im Monat', days: 30, cat: 'Fitness', type: 'summe', target: 60, unit: 'km', color: 'blue', season: [], rules: ['Laufen oder Gehen, Kilometer eintragen'] },
     { id: 'steps', name: '10.000 Schritte', days: 30, cat: 'Fitness', type: 'zahl', target: 10000, unit: 'Schritte', color: 'blue', season: [], rules: ['Schritte am Abend eintragen'] },
+    { id: 'run5k', name: 'Bis 5 km laufen', days: 56, cat: 'Fitness', type: 'woche', target: 3, color: 'blue', season: [], rules: ['Dreimal pro Woche laufen, langsam steigern'], note: 'Für Einsteiger, 8 Wochen' },
+    { id: 'stretch', name: 'Täglich dehnen', days: 30, cat: 'Fitness', type: 'zahl', target: 10, unit: 'Min.', color: 'violet', season: [], rules: ['Jeden Tag dehnen oder mobilisieren'] },
+    { id: 'spazieren', name: '30 Min. draußen gehen', days: 30, cat: 'Gesundheit', type: 'zahl', target: 30, unit: 'Min.', color: 'green', season: [], rules: ['Jeden Tag spazieren gehen'] },
+    { id: 'kaltduschen', name: 'Kalt duschen', days: 30, cat: 'Gesundheit', type: 'jn', color: 'blue', season: [], rules: ['Die Dusche kalt beenden'] },
+    { id: 'wasser', name: '2 Liter Wasser', days: 30, cat: 'Gesundheit', type: 'zahl', target: 2, unit: 'L', color: 'blue', season: [], rules: ['Über den Tag verteilt trinken'] },
+    { id: 'schlaf', name: 'Vor 23 Uhr ins Bett', days: 30, cat: 'Gesundheit', type: 'jn', color: 'violet', season: [], rules: ['Licht aus vor 23 Uhr'] },
+    { id: 'alkoholfrei', name: '30 Tage alkoholfrei', days: 30, cat: 'Gesundheit', type: 'jn', color: 'blue', season: [], rules: ['Keinen Alkohol trinken'] },
     { id: 'junk', name: 'Kein Junkfood', days: 30, cat: 'Ernährung', type: 'jn', color: 'green', season: [], rules: ['Kein Fast Food, keine Süßigkeiten'] },
+    { id: 'zucker', name: 'Kein Zucker', days: 30, cat: 'Ernährung', type: 'jn', color: 'green', season: [], rules: ['Kein zugesetzter Zucker'] },
+    { id: 'gemuese', name: 'Gemüse zu jeder Mahlzeit', days: 30, cat: 'Ernährung', type: 'jn', color: 'green', season: [], rules: ['Bei jeder Hauptmahlzeit Gemüse'] },
+    { id: 'kochen', name: 'Selbst kochen', days: 30, cat: 'Ernährung', type: 'woche', target: 5, color: 'orange', season: [], rules: ['Fünfmal pro Woche selbst kochen'] },
+    { id: 'meditation', name: 'Meditation', days: 30, cat: 'Mindset', type: 'zahl', target: 10, unit: 'Min.', color: 'violet', season: [], rules: ['Jeden Tag meditieren'] },
+    { id: 'journal', name: 'Journaling', days: 30, cat: 'Mindset', type: 'jn', color: 'violet', season: [], rules: ['Jeden Abend ein paar Zeilen schreiben'] },
+    { id: 'dank', name: 'Dankbarkeit', days: 30, cat: 'Mindset', type: 'zahl', target: 3, unit: 'Einträge', color: 'green', season: [], rules: ['Drei Dinge aufschreiben'] },
     { id: 'lesen', name: '20 Min. Lesen', days: 30, cat: 'Lernen', type: 'zahl', target: 20, unit: 'Min.', color: 'blue', season: [], rules: ['Jeden Tag lesen'] },
-    { id: 'declutter', name: 'Minimalismus', days: 30, cat: 'Lifestyle', type: 'jn', color: 'grey', season: [], rules: ['Jeden Tag einen Gegenstand aussortieren'] },
+    { id: 'sprache', name: 'Sprache lernen', days: 30, cat: 'Lernen', type: 'zahl', target: 15, unit: 'Min.', color: 'blue', season: [], rules: ['Jeden Tag Vokabeln oder eine Lektion'] },
+    { id: 'nospend', name: 'No-Spend-Monat', days: 30, cat: 'Finanzen', type: 'jn', color: 'red', season: [], rules: ['Nur Notwendiges kaufen'] },
+    { id: 'sparen', name: 'Täglich sparen', days: 30, cat: 'Finanzen', type: 'summe', target: 300, unit: '€', color: 'red', season: [], rules: ['Jeden Tag einen kleinen Betrag zurücklegen'] },
+    { id: 'digital', name: 'Handyfreie Abende', days: 30, cat: 'Selfcare', type: 'jn', color: 'grey', season: [], rules: ['Ab 21 Uhr kein Handy'] },
+    { id: 'socialpause', name: 'Social-Media-Pause', days: 30, cat: 'Selfcare', type: 'jn', color: 'grey', season: [], rules: ['Keine Social-Media-Apps öffnen'] },
     { id: 'frueh', name: 'Früh aufstehen', days: 30, cat: 'Routine', type: 'jn', color: 'orange', season: [], rules: ['Vor 6 Uhr aufstehen'] },
-    { id: 'dank', name: 'Dankbarkeit', days: 30, cat: 'Mindset', type: 'zahl', target: 3, unit: 'Einträge', color: 'green', season: [], rules: ['Drei Dinge aufschreiben'] }
+    { id: 'bett', name: 'Bett machen', days: 30, cat: 'Routine', type: 'jn', color: 'grey', season: [], rules: ['Direkt nach dem Aufstehen'] },
+    { id: 'declutter', name: 'Minimalismus', days: 30, cat: 'Lifestyle', type: 'jn', color: 'grey', season: [], rules: ['Jeden Tag einen Gegenstand aussortieren'] }
   ];
-  var CATS = ['Fitness', 'Kreativität', 'Ernährung', 'Finanzen', 'Lernen', 'Mindset', 'Selfcare', 'Routine', 'Lifestyle', 'Fun'];
+  var CATS = ['Fitness', 'Gesundheit', 'Ernährung', 'Mindset', 'Kreativität', 'Lernen', 'Natur', 'Finanzen', 'Selfcare', 'Routine', 'Lifestyle', 'Fun'];
 
   // ---------- dates ----------
   function pad(n) { return (n < 10 ? '0' : '') + n; }
@@ -184,7 +226,7 @@
 
   function renderTabs() {
     var tabs = [['heute', 'Heute', 'sun'], ['monat', 'Monat', 'cal'], ['bibliothek', 'Bibliothek', 'lib'], ['profil', 'Profil', 'user']];
-    var main = { heute: 'heute', monat: 'monat', bibliothek: 'bibliothek', profil: 'profil', einstellungen: 'profil', setup: 'bibliothek', detail: ui.back === 'monat' ? 'monat' : 'heute', rueckblick: 'heute', teilen: 'heute' }[ui.view];
+    var main = { heute: 'heute', monat: 'monat', bibliothek: 'bibliothek', profil: 'profil', einstellungen: 'profil', jahr: 'monat', setup: 'bibliothek', detail: ui.back === 'monat' ? 'monat' : 'heute', rueckblick: 'heute', teilen: 'heute' }[ui.view];
     document.getElementById('tabs').innerHTML = tabs.map(function (t) {
       return '<button class="tab" data-a="go" data-v="' + t[0] + '"' + (main === t[0] ? ' aria-current="page"' : '') + '><span class="pill">' + ICON[main === t[0] ? t[2] + 'Fill' : t[2]] + '</span>' + t[1] + '</button>';
     }).join('');
@@ -194,7 +236,11 @@
   function render() {
     if (!state.onboarded && state.challenges.length === 0 && ['bibliothek', 'setup', 'einstellungen'].indexOf(ui.view) < 0) ui.view = 'onboarding';
     var views = { onboarding: vOnboarding, heute: vHeute, monat: vMonat, bibliothek: vBibliothek, setup: vSetup, detail: vDetail, rueckblick: vRueckblick, teilen: vTeilen, profil: vProfil, einstellungen: vEinstellungen };
+    var keep = Array.prototype.map.call(document.querySelectorAll('.chips.scroll'), function (e) { return e.scrollLeft; }), sameView = render.last === ui.view;
+    views.jahr = vJahr;
     document.getElementById('app').innerHTML = (views[ui.view] || vHeute)();
+    if (sameView) Array.prototype.forEach.call(document.querySelectorAll('.chips.scroll'), function (e, i) { if (keep[i]) e.scrollLeft = keep[i]; });
+    render.last = ui.view;
     renderTabs();
     ui.popId = null; ui.popToday = false;
     if (ui.view === 'einstellungen' && typeof loadVersionLabel === 'function') loadVersionLabel();
@@ -289,6 +335,7 @@
       '<div class="week">' + dots + '</div>' +
       '<div class="hero-foot"><span class="row" style="gap:6px;font-weight:600;color:var(--ink2)"><span style="width:16px;height:16px;display:inline-flex">' + ICON.shield + '</span>' + (st.freezeUsed ? 'Streak-Schutz diese Woche genutzt' : '1 Streak-Schutz verfügbar') + '</span><span class="muted num">Rekord: ' + st.best + '</span></div></section>';
 
+    var soon = upcoming(t, 21)[0]; if (soon) h += soonCard(soon, true);
     ended.forEach(function (ch) {
       h += '<section class="card warm"><div class="between"><div class="stack" style="gap:2px"><span class="eyebrow" style="color:var(--rt)">Zeitraum vorbei</span><strong>' + esc(ch.name) + '</strong></div><button class="btn sm warm" data-a="open-review" data-v="' + ch.id + '">Rückblick</button></div></section>';
     });
@@ -360,7 +407,7 @@
     var list = state.challenges.filter(function (c) { return c.start <= me && chEnd(c) >= ms; }).sort(function (a, b) { return a.start < b.start ? -1 : 1; });
     var kind = k < cur ? 'past' : (k > cur ? 'future' : 'now');
     var mName = MONTHS[+k.slice(5) - 1];
-    var h = topbar(eyebrow(kind === 'now' ? 'Aktueller Monat' : kind === 'past' ? 'Vergangen' : 'Geplant'), '<button class="icon-btn" data-a="share-month" aria-label="Monat teilen">' + ICON.share + '</button>');
+    var h = topbar(eyebrow(kind === 'now' ? 'Aktueller Monat' : kind === 'past' ? 'Vergangen' : 'Geplant'), '<button class="icon-btn" data-a="go" data-v="jahr" aria-label="Jahresplaner">' + ICON.calPlus + '</button><button class="icon-btn" data-a="share-month" aria-label="Monat teilen">' + ICON.share + '</button>');
     h += '<header class="stack" style="gap:6px"><div class="row"><button class="icon-btn" style="width:40px;height:40px" aria-label="Vorheriger Monat" data-a="month" data-v="-1">' + ICON.back + '</button>' +
       '<h1 style="flex:1;text-align:center;font-size:38px">' + mName + '</h1>' +
       '<button class="icon-btn" style="width:40px;height:40px" aria-label="Nächster Monat" data-a="month" data-v="1">' + ICON.next + '</button></div>' +
@@ -402,36 +449,95 @@
     return h;
   }
 
-  function seasonHint() {
-    var t = today(), d = parse(t), next = (d.getMonth() + 1) % 12 + 1, left = monthLen(monthKey(t)) - d.getDate();
-    if (left > 14) return '';
-    var tp = TEMPLATES.filter(function (x) { return x.season.indexOf(next) >= 0 && x.season.indexOf(d.getMonth() + 1) < 0; })[0];
-    if (!tp) return '';
-    return '<button class="card warm" style="flex-direction:row;align-items:center;gap:14px;cursor:pointer;text-align:left;color:inherit" data-a="tpl-next" data-v="' + tp.id + '"><span class="tile" style="background:var(--r);color:var(--onR)"><span style="width:20px;height:20px;display:inline-flex">' + ICON.cal + '</span></span><span class="stack" style="gap:2px;flex:1"><span class="eyebrow" style="font-size:11px;color:var(--rt)">Bald relevant</span><strong>' + esc(tp.name) + ' startet im ' + MONTHS[next - 1] + '</strong><span class="small" style="color:var(--ink2)">Jetzt schon für den 1. ' + MONTHS[next - 1] + ' planen</span></span></button>';
+  // ---------- saisonale Termine ----------
+  function easter(y) { var a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30, i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451), mo = Math.floor((h + l - 7 * m + 114) / 31), da = ((h + l - 7 * m + 114) % 31) + 1; return y + '-' + pad(mo) + '-' + pad(da); }
+  function startIn(tp, y) {
+    if (tp.when === 'lent') return addDays(easter(y), -46);
+    if (tp.when === 'advent') return y + '-12-01';
+    if (!tp.season.length) return null;
+    return y + '-' + pad(tp.season[0]) + '-01';
   }
+  function nextStart(tp, t) { var y = +t.slice(0, 4), s = startIn(tp, y); if (!s) return null; return s >= t ? s : startIn(tp, y + 1); }
+  function inSeasonNow(tp, t) { var y = +t.slice(0, 4), s = startIn(tp, y); if (!s) return false; return t >= s && t <= addDays(s, tp.days - 1); }
+  function hasRunningOrPlanned(name, t) { return state.challenges.some(function (c) { var p = phase(c, t); return c.name === name && (p === 'active' || p === 'planned'); }); }
+  function upcoming(t, withinDays) {
+    return TEMPLATES.map(function (tp) { var s = nextStart(tp, t); return s ? { tp: tp, start: s, inDays: diff(t, s) } : null; })
+      .filter(function (x) { return x && x.inDays >= 0 && x.inDays <= withinDays && !hasRunningOrPlanned(x.tp.name, t) && !(state.settings.hiddenHints || {})[x.tp.id + '-' + x.start.slice(0, 4)]; })
+      .sort(function (a, b) { return a.inDays - b.inDays; });
+  }
+  function inWords(n) { return n === 0 ? 'heute' : n === 1 ? 'morgen' : n < 14 ? 'in ' + n + ' Tagen' : 'in ' + Math.round(n / 7) + ' Wochen'; }
+  function soonCard(x, dismissible) {
+    return '<div class="card warm" style="flex-direction:row;align-items:center;gap:14px"><span class="tile" style="background:var(--r);color:var(--onR)"><span style="width:20px;height:20px;display:inline-flex">' + ICON.cal + '</span></span>' +
+      '<button class="stack" style="gap:2px;flex:1;min-width:0;background:none;border:none;padding:0;text-align:left;cursor:pointer;color:inherit" data-a="tpl-at" data-v="' + x.tp.id + '|' + x.start + '"><span class="eyebrow" style="font-size:11px;color:var(--rt)">Bald relevant</span><strong>' + esc(x.tp.name) + ' startet ' + inWords(x.inDays) + '</strong><span class="small" style="color:var(--ink2)">' + fmtY(x.start) + ' · jetzt einplanen</span></button>' +
+      (dismissible ? '<button class="btn ghost sm" style="color:var(--ink3);margin-right:-8px" aria-label="Vorschlag ausblenden" data-a="hint-hide" data-v="' + x.tp.id + '-' + x.start.slice(0, 4) + '">' + ICON.x + '</button>' : '') + '</div>';
+  }
+  function vJahr() {
+    var t = today(), start = monthKey(t), rows = '';
+    var per = state.periods;
+    for (var i = 0; i < 12; i++) {
+      var k = monthShift(start, i), ms = k + '-01', me = k + '-' + pad(monthLen(k)), mo = +k.slice(5);
+      var mine = state.challenges.filter(function (c) { return c.start <= me && chEnd(c) >= ms && c.status !== 'stopped'; });
+      var chips = mine.map(function (c) {
+        var p = phase(c, t), run = p === 'active' && i === 0;
+        return '<button class="ychip ' + (run ? 'run' : p === 'done' || p === 'ended' ? 'past' : 'plan') + '" data-a="open-detail" data-v="' + c.id + '">' + esc(c.name) + '</button>';
+      }).join('');
+      var sugg = TEMPLATES.filter(function (tp) { var s = nextStart(tp, t); return s && s.slice(0, 7) === k && !mine.some(function (c) { return c.name === tp.name; }); });
+      chips += sugg.slice(0, 4).map(function (tp) { var s = nextStart(tp, t); return '<button class="ychip sug" data-a="tpl-at" data-v="' + tp.id + '|' + s + '">+ ' + esc(tp.name) + '</button>'; }).join('');
+      chips += '<button class="ychip add" data-a="jahr-plan" data-v="' + k + '" aria-label="Challenge für ' + MONTHS[mo - 1] + ' planen">' + ICON.plus + '</button>';
+      var marks = [];
+      if (mo === 1) marks.push(['fresh', '01.01. · Neujahr, guter Starttermin']);
+      per.forEach(function (p) {
+        [100, 365, 500, 1000].forEach(function (n) { var d = addDays(p.start, n - 1); if (d.slice(0, 7) === k && d >= t && d <= p.end) marks.push(['mile', fmt(d) + ' · ' + esc(p.name) + ' Tag ' + n]); });
+        if (p.end.slice(0, 7) === k && p.end >= t) marks.push(['mile', fmt(p.end) + ' · ' + esc(p.name) + ' endet']);
+      });
+      rows += '<div class="yrow"><div class="ymonth' + (i === 0 ? ' now' : '') + '"><span>' + MONTHS[mo - 1].slice(0, 3) + '</span><small class="num">' + k.slice(0, 4) + '</small></div><div class="stack" style="gap:8px;flex:1;min-width:0"><div class="ychips">' + chips + '</div>' +
+        marks.map(function (m) { return '<span class="ymark ' + m[0] + '">' + m[1] + '</span>'; }).join('') + '</div></div>';
+    }
+    var h = topbar(backBtn('Monat', 'monat')) + '<header class="stack" style="gap:6px">' + eyebrow(MONTHS[parse(t).getMonth()].slice(0, 3) + ' ' + t.slice(0, 4) + ' bis ' + MONTHS[parse(monthShift(start, 11) + '-01').getMonth()].slice(0, 3) + ' ' + monthShift(start, 11).slice(0, 4)) + '<h1>Dein Jahr</h1></header>';
+    h += '<div class="ylegend"><span><i class="lg run"></i>Läuft</span><span><i class="lg plan"></i>Geplant</span><span><i class="lg sug"></i>Vorschlag</span><span><i class="lg fresh"></i>Neustart</span><span><i class="lg mile"></i>Meilenstein</span></div>';
+    h += '<section class="card" style="padding:4px 16px;gap:0">' + rows + '</section>';
+    h += '<p class="xs muted">Tippe auf einen Vorschlag, um ihn mit dem passenden Startdatum einzuplanen. Monatsanfänge und Neujahr eignen sich besonders gut für einen Neustart.</p>';
+    return h;
+  }
+  function seasonHint() { return upcoming(today(), 35).slice(0, 2).map(function (x) { return soonCard(x, true); }).join(''); }
 
+  function libList() {
+    var t = today(), m = parse(t).getMonth() + 1, f = ui.lib, q = ui.q.trim().toLowerCase();
+    var l = TEMPLATES.filter(function (x) {
+      if (q) return (x.name + ' ' + x.cat + ' ' + x.rules.join(' ')).toLowerCase().indexOf(q) >= 0;
+      if (f === 'jetzt') return inSeasonNow(x, t) || x.season.indexOf(m) >= 0 || ['writing', 'meditation', 'spazieren', 'lesen'].indexOf(x.id) >= 0;
+      if (f === 'saison') return x.season.length > 0;
+      return x.cat === f;
+    });
+    if (f === 'saison' && !q) l.sort(function (a, b) { return nextStart(a, t) < nextStart(b, t) ? -1 : 1; });
+    return l;
+  }
+  function libRunning() { var t = today(), r = {}; state.challenges.forEach(function (c) { var p = phase(c, t); if (p === 'active' || p === 'planned') r[c.name] = { p: p, id: c.id }; }); return r; }
+  function libChips() {
+    var f = ui.lib, q = ui.q.trim();
+    return chip('Jetzt passend', 'lib', 'jetzt', f === 'jetzt' && !q) + chip('Saisonal', 'lib', 'saison', f === 'saison' && !q) + CATS.filter(function (c) { return TEMPLATES.some(function (x) { return x.cat === c; }); }).map(function (c) { return chip(esc(c), 'lib', c, f === c && !q); }).join('');
+  }
   function vBibliothek() {
     var t = today(), m = parse(t).getMonth() + 1, f = ui.lib, q = ui.q.trim().toLowerCase();
-    var running = {}; state.challenges.forEach(function (c) { var p = phase(c, t); if (p === 'active' || p === 'planned') running[c.name] = { p: p, id: c.id }; });
-    var list = TEMPLATES.filter(function (x) {
-      if (q) return x.name.toLowerCase().indexOf(q) >= 0 || x.cat.toLowerCase().indexOf(q) >= 0;
-      return f === 'jetzt' ? (x.season.indexOf(m) >= 0 || (x.season.length === 0 && ['writing', 'plank', 'junk'].indexOf(x.id) >= 0)) : x.cat === f;
-    });
-    var h = topbar(eyebrow(TEMPLATES.length + ' Vorlagen')) + '<h1>Bibliothek</h1>';
+    var h = topbar(eyebrow(TEMPLATES.length + ' Vorlagen'), '<button class="icon-btn" data-a="go" data-v="jahr" aria-label="Jahresplaner">' + ICON.calPlus + '</button>') + '<h1>Bibliothek</h1>';
+    if (ui.planFor) h += '<div class="card soft" style="flex-direction:row;align-items:center;gap:12px"><span class="small" style="flex:1;color:var(--pd)"><strong>Planen für ' + MONTHS[+ui.planFor.slice(5, 7) - 1] + ' ' + ui.planFor.slice(0, 4) + '</strong><br>Start am ' + fmtY(ui.planFor) + '</span><button class="btn ghost sm" data-a="plan-clear" aria-label="Planung abbrechen" style="color:var(--ink3)">' + ICON.x + '</button></div>';
     h += '<label class="search">' + ICON.search + '<span class="sr">Challenges durchsuchen</span><input type="search" id="lib-q" data-in="q" value="' + esc(ui.q) + '" placeholder="Challenge suchen"></label>';
-    h += '<div class="chips scroll" role="group" aria-label="Filter">' + chip('Jetzt passend', 'lib', 'jetzt', f === 'jetzt' && !q) + CATS.filter(function (c) { return TEMPLATES.some(function (x) { return x.cat === c; }); }).map(function (c) { return chip(esc(c), 'lib', c, f === c && !q); }).join('') + '</div>';
-    h += '<div id="lib-results" class="stack" style="gap:12px">' + libResults(list, running, q, f, m) + '</div>';
+    h += '<div class="chips scroll" id="lib-chips" role="group" aria-label="Filter">' + libChips() + '</div>';
+    h += '<div id="lib-results" class="stack" style="gap:12px">' + libResults(libList(), libRunning(), q, f, m) + '</div>';
     return h;
   }
   function libResults(list, running, q, f, m) {
+    var t = today();
     var h = q ? '' : seasonHint();
-    h += '<div class="section-head"><h2>' + (q ? 'Suche' : f === 'jetzt' ? 'Passend zum ' + MONTHS[m - 1] : esc(f)) + '</h2><span class="small muted num">' + list.length + (list.length === 1 ? ' Vorlage' : ' Vorlagen') + '</span></div>';
+    h += '<div class="section-head"><h2>' + (q ? 'Suche' : f === 'jetzt' ? 'Passend zum ' + MONTHS[m - 1] : f === 'saison' ? 'Übers Jahr' : esc(f)) + '</h2><span class="small muted num">' + list.length + (list.length === 1 ? ' Vorlage' : ' Vorlagen') + '</span></div>';
     if (!list.length) h += '<p class="muted">Keine Vorlage gefunden. Erstelle einfach eine eigene.</p>';
     h += list.map(function (x) {
-      var r = running[x.name];
-      return '<section class="card" style="gap:10px;padding:14px 16px"><div class="row" style="gap:14px"><span class="tile" style="width:44px;height:44px;font-size:22px;color:' + color(x.color) + '">' + initial(x.name) + '</span><span style="flex:1;min-width:0" class="stack"><strong style="font-size:16px;line-height:1.2">' + esc(x.name) + '</strong><span class="xs muted num" style="margin-top:-6px">' + x.days + ' Tage · ' + esc(x.cat) + ' · ' + TYPES[x.type] + (x.target ? ' · Ziel ' + x.target + ' ' + esc(x.unit || '') : '') + '</span></span>' +
-        (r ? '<button class="btn sm pill" style="background:var(--surf2);border-color:transparent;color:var(--ink2)" data-a="open-detail" data-v="' + r.id + '"><span class="dot" style="width:7px;height:7px;background:var(--ok)"></span>' + (r.p === 'active' ? 'Läuft' : 'Geplant') + '</button>' : '<button class="btn sm pill primary" data-a="tpl" data-v="' + x.id + '">Starten</button>') + '</div>' +
-        '<p class="small" style="color:var(--ink2)">' + esc(x.rules.join(', ')) + '</p></section>';
+      var r = running[x.name], ns = nextStart(x, t), seasonalLater = x.season.length && !inSeasonNow(x, t);
+      var btn = r ? '<button class="btn sm pill" style="background:var(--surf2);border-color:transparent;color:var(--ink2)" data-a="open-detail" data-v="' + r.id + '"><span class="dot" style="width:7px;height:7px;background:var(--ok)"></span>' + (r.p === 'active' ? 'Läuft' : 'Geplant') + '</button>'
+        : seasonalLater ? '<button class="btn sm pill" data-a="tpl-at" data-v="' + x.id + '|' + ns + '">Planen</button>'
+        : '<button class="btn sm pill primary" data-a="tpl" data-v="' + x.id + '">Starten</button>';
+      return '<section class="card" style="gap:10px;padding:14px 16px"><div class="row" style="gap:14px"><span class="tile" style="width:44px;height:44px;font-size:22px;color:' + color(x.color) + '">' + initial(x.name) + '</span><span style="flex:1;min-width:0" class="stack"><strong style="font-size:16px;line-height:1.2">' + esc(x.name) + '</strong><span class="xs muted num" style="margin-top:-6px">' + x.days + ' Tage · ' + esc(x.cat) + ' · ' + TYPES[x.type] + (x.target ? ' · Ziel ' + x.target.toLocaleString('de-DE') + ' ' + esc(x.unit || '') : '') + (seasonalLater && ns ? ' · ab ' + fmtY(ns) : '') + '</span></span>' + btn + '</div>' +
+        '<p class="small" style="color:var(--ink2)">' + esc(x.rules.join(', ')) + '</p>' + (x.note ? '<p class="xs muted">' + esc(x.note) + '</p>' : '') + '</section>';
     }).join('');
     h += '<button class="btn dashed block" data-a="new-custom">' + ICON.plus + 'Eigene Challenge erstellen</button>';
     return h;
@@ -692,7 +798,7 @@
   function snapshot() { var t = today(), act = activeList(t); return { done: act.filter(function (c) { return doneToday(c, t); }).length, safe: activeOn(t) }; }
 
   var A = {
-    go: function (v) { if (v === 'teilen') return openShare({}); if (v === 'detail' && !ui.detailId) v = 'heute'; go(v); },
+    go: function (v) { if (v !== 'bibliothek' && v !== 'setup') ui.planFor = null; if (v === 'teilen') return openShare({}); if (v === 'detail' && !ui.detailId) v = 'heute'; go(v); },
     theme: function () { state.settings.theme = isDark() ? 'light' : 'dark'; applyTheme(); commit(); },
     'set-theme': function (v) { state.settings.theme = v; applyTheme(); commit(); },
     reminder: function () { if (state.settings.reminder) { state.settings.reminder = false; save(); syncReminderTags(); render(); } else enableReminder(); },
@@ -719,7 +825,17 @@
     goal: function (id) { var md = monthData(ui.month), was = md.goals.every(function (g) { return g.done; }); md.goals.forEach(function (g) { if (g.id === id) g.done = !g.done; }); save(); if (!was && md.goals.length && md.goals.every(function (g) { return g.done; })) toast('Alle Monatsziele erreicht', 'Was für ein Monat.'); render(); },
     'goal-del': function (id) { var md = monthData(ui.month); md.goals = md.goals.filter(function (g) { return g.id !== id; }); commit(); },
     'share-month': function () { openShare({ tpl: 'monat', month: ui.month, back: 'monat' }); },
-    lib: function (v) { ui.lib = v; ui.q = ''; render(); },
+    lib: function (v) {
+      ui.lib = v; ui.q = '';
+      var ch = document.getElementById('lib-chips'), res = document.getElementById('lib-results'), inp = document.getElementById('lib-q');
+      if (!ch || !res) { render(); return; }
+      var sl = ch.scrollLeft; ch.innerHTML = libChips(); ch.scrollLeft = sl; if (inp) inp.value = '';
+      res.innerHTML = libResults(libList(), libRunning(), '', v, parse(today()).getMonth() + 1);
+    },
+    'tpl-at': function (v) { var parts = v.split('|'), tp = TEMPLATES.filter(function (x) { return x.id === parts[0]; })[0]; ui.form = newForm(tp, parts[1]); ui.planFor = null; go('setup'); },
+    'plan-clear': function () { ui.planFor = null; render(); },
+    'hint-hide': function (v) { state.settings.hiddenHints = state.settings.hiddenHints || {}; state.settings.hiddenHints[v] = true; commit(); },
+    'jahr-plan': function (k) { ui.planFor = k + '-01'; ui.lib = 'jetzt'; go('bibliothek'); },
     tpl: function (id) { var tp = TEMPLATES.filter(function (x) { return x.id === id; })[0]; ui.form = newForm(tp, ui.planFor || null); ui.planFor = null; go('setup'); },
     'tpl-next': function (id) { var tp = TEMPLATES.filter(function (x) { return x.id === id; })[0]; ui.form = newForm(tp, nextMonthStart(today())); go('setup'); },
     'new-custom': function () { ui.form = newForm(null, ui.planFor || null); ui.planFor = null; go('setup'); },
@@ -787,11 +903,9 @@
       return;
     }
     if (k === 'q') {
-      ui.q = v;
-      var t = today(), m = parse(t).getMonth() + 1, q = v.trim().toLowerCase(), running = {};
-      state.challenges.forEach(function (c) { var p = phase(c, t); if (p === 'active' || p === 'planned') running[c.name] = { p: p, id: c.id }; });
-      var list = TEMPLATES.filter(function (x) { return q ? (x.name.toLowerCase().indexOf(q) >= 0 || x.cat.toLowerCase().indexOf(q) >= 0) : (ui.lib === 'jetzt' ? (x.season.indexOf(m) >= 0 || (x.season.length === 0 && ['writing', 'plank', 'junk'].indexOf(x.id) >= 0)) : x.cat === ui.lib); });
-      document.getElementById('lib-results').innerHTML = libResults(list, running, q, ui.lib, m);
+      ui.q = v; var t0 = today();
+      document.getElementById('lib-results').innerHTML = libResults(libList(), libRunning(), v.trim().toLowerCase(), ui.lib, parse(t0).getMonth() + 1);
+      var ch = document.getElementById('lib-chips'); if (ch) { var sl = ch.scrollLeft; ch.innerHTML = libChips(); ch.scrollLeft = sl; }
       return;
     }
     if (k === 'share') { ui.share.text = v; return; }
