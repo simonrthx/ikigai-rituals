@@ -179,7 +179,7 @@
   function nextMonthStart(s) { return monthShift(monthKey(s), 1) + '-01'; }
 
   // ---------- state ----------
-  function blank() { return { v: 1, onboarded: false, challenges: [], checkins: {}, months: {}, periods: [], settings: { tags: '#1000tagechallenge', theme: 'system', reminder: false, reminderTime: '20:00' } }; }
+  function blank() { return { v: 1, onboarded: false, challenges: [], checkins: {}, months: {}, periods: [], bucket: [], years: {}, settings: { tags: '#1000tagechallenge', theme: 'system', reminder: false, reminderTime: '20:00' } }; }
   var state = blank();
   var ui = { view: 'heute', month: monthKey(today()), detailId: null, lib: 'jetzt', q: '', form: null, share: null, openNote: {}, confirm: null, editDate: null, importOpen: false, periodForm: false, popId: null };
 
@@ -305,7 +305,7 @@
 
   function renderTabs() {
     var tabs = [['heute', 'Heute', 'sun'], ['monat', 'Monat', 'cal'], ['bibliothek', 'Bibliothek', 'lib'], ['profil', 'Profil', 'user']];
-    var main = { heute: 'heute', monat: 'monat', bibliothek: 'bibliothek', profil: 'profil', einstellungen: 'profil', jahr: 'monat', setup: 'bibliothek', detail: ui.back === 'monat' ? 'monat' : 'heute', rueckblick: ui.rvBack === 'tagebuch' ? 'profil' : 'heute', teilen: 'heute', tagebuch: 'profil', artikel: ui.artBack === 'heute' ? 'heute' : ui.artBack === 'detail' ? 'heute' : 'bibliothek' }[ui.view];
+    var main = { heute: 'heute', monat: 'monat', bibliothek: 'bibliothek', profil: 'profil', einstellungen: 'profil', jahr: 'monat', setup: 'bibliothek', detail: ui.back === 'monat' ? 'monat' : 'heute', rueckblick: ui.rvBack === 'tagebuch' ? 'profil' : 'heute', teilen: 'heute', tagebuch: 'profil', bucket: 'monat', bnew: 'monat', bitem: 'monat', js: 'heute', brief: 'heute', artikel: ui.artBack === 'heute' ? 'heute' : ui.artBack === 'detail' ? 'heute' : 'bibliothek' }[ui.view];
     document.getElementById('tabs').innerHTML = tabs.map(function (t) {
       return '<button class="tab" data-a="go" data-v="' + t[0] + '"' + (main === t[0] ? ' aria-current="page"' : '') + '><span class="pill">' + ICON[main === t[0] ? t[2] + 'Fill' : t[2]] + '</span>' + t[1] + '</button>';
     }).join('');
@@ -314,7 +314,7 @@
 
   function render() {
     if (!state.onboarded && state.challenges.length === 0 && ['bibliothek', 'setup', 'einstellungen'].indexOf(ui.view) < 0) ui.view = 'onboarding';
-    var views = { onboarding: vOnboarding, heute: vHeute, monat: vMonat, bibliothek: vBibliothek, setup: vSetup, detail: vDetail, rueckblick: vRueckblick, teilen: vTeilen, profil: vProfil, einstellungen: vEinstellungen, tagebuch: vTagebuch, artikel: vArtikel };
+    var views = { onboarding: vOnboarding, heute: vHeute, monat: vMonat, bibliothek: vBibliothek, setup: vSetup, detail: vDetail, rueckblick: vRueckblick, teilen: vTeilen, profil: vProfil, einstellungen: vEinstellungen, tagebuch: vTagebuch, artikel: vArtikel, bucket: vBucket, bnew: vBucketNew, bitem: vBucketItem, js: vJs, brief: vBrief };
     var keep = Array.prototype.map.call(document.querySelectorAll('.chips.scroll'), function (e) { return e.scrollLeft; }), sameView = render.last === ui.view;
     views.jahr = vJahr;
     document.getElementById('app').innerHTML = (views[ui.view] || vHeute)();
@@ -394,7 +394,9 @@
     var all = active.length > 0 && doneN === active.length;
     var md = state.months[monthKey(t)];
     var h = topbar(brand(), '<button class="icon-btn" data-a="go" data-v="teilen" aria-label="Tag teilen">' + ICON.share + '</button>');
-    h += '<header class="stack" style="gap:2px">' + eyebrow(WD_LONG[d.getDay()] + ', ' + d.getDate() + '. ' + MONTHS[d.getMonth()]) + '<h1>' + (all ? 'Gut gemacht.' : 'Heute') + '</h1></header>';
+    var yw = (state.years || {})[d.getFullYear()];
+    h += '<header class="stack" style="gap:2px">' + eyebrow(WD_LONG[d.getDay()] + ', ' + d.getDate() + '. ' + MONTHS[d.getMonth()] + (yw && yw.done && yw.word ? ' · <span style="color:var(--rt)">' + esc(yw.word) + '</span>' : '')) + '<h1>' + (all ? 'Gut gemacht.' : 'Heute') + '</h1></header>';
+    h += letterCard(t) + jsCard(t);
     if (showInstall() && !(state.settings.installHideUntil && state.settings.installHideUntil > Date.now())) h += installCard(true);
     if (state.sample) h += '<p class="xs" style="color:var(--rt);font-weight:700">Beispieldaten geladen. Abhaken, ändern und löschen funktioniert echt.</p>';
 
@@ -487,7 +489,7 @@
     var list = state.challenges.filter(function (c) { return c.start <= me && chEnd(c) >= ms; }).sort(function (a, b) { return a.start < b.start ? -1 : 1; });
     var kind = k < cur ? 'past' : (k > cur ? 'future' : 'now');
     var mName = MONTHS[+k.slice(5) - 1];
-    var h = topbar(eyebrow(kind === 'now' ? 'Aktueller Monat' : kind === 'past' ? 'Vergangen' : 'Geplant'), '<button class="icon-btn" data-a="go" data-v="jahr" aria-label="Jahresplaner">' + ICON.calPlus + '</button><button class="icon-btn" data-a="share-month" aria-label="Monat teilen">' + ICON.share + '</button>');
+    var h = planSeg('monat') + topbar(eyebrow(kind === 'now' ? 'Aktueller Monat' : kind === 'past' ? 'Vergangen' : 'Geplant'), '<button class="icon-btn" data-a="share-month" aria-label="Monat teilen">' + ICON.share + '</button>');
     h += '<header class="stack" style="gap:6px"><div class="row"><button class="icon-btn" style="width:40px;height:40px" aria-label="Vorheriger Monat" data-a="month" data-v="-1">' + ICON.back + '</button>' +
       '<h1 style="flex:1;text-align:center;font-size:38px">' + mName + '</h1>' +
       '<button class="icon-btn" style="width:40px;height:40px" aria-label="Nächster Monat" data-a="month" data-v="1">' + ICON.next + '</button></div>' +
@@ -573,10 +575,12 @@
       rows += '<div class="yrow"><div class="ymonth' + (i === 0 ? ' now' : '') + '"><span>' + MONTHS[mo - 1].slice(0, 3) + '</span><small class="num">' + k.slice(0, 4) + '</small></div><div class="stack" style="gap:8px;flex:1;min-width:0"><div class="ychips">' + chips + '</div>' +
         marks.map(function (m) { return '<span class="ymark ' + m[0] + '">' + m[1] + '</span>'; }).join('') + '</div></div>';
     }
-    var h = topbar(backBtn('Monat', 'monat')) + '<header class="stack" style="gap:6px">' + eyebrow(MONTHS[parse(t).getMonth()].slice(0, 3) + ' ' + t.slice(0, 4) + ' bis ' + MONTHS[parse(monthShift(start, 11) + '-01').getMonth()].slice(0, 3) + ' ' + monthShift(start, 11).slice(0, 4)) + '<h1>Dein Jahr</h1></header>';
+    var h = planSeg('jahr') + '<header class="stack" style="gap:6px">' + eyebrow(MONTHS[parse(t).getMonth()].slice(0, 3) + ' ' + t.slice(0, 4) + ' bis ' + MONTHS[parse(monthShift(start, 11) + '-01').getMonth()].slice(0, 3) + ' ' + monthShift(start, 11).slice(0, 4)) + '<h1>Dein Jahr</h1></header>';
     h += '<div class="ylegend"><span><i class="lg run"></i>Läuft</span><span><i class="lg plan"></i>Geplant</span><span><i class="lg sug"></i>Vorschlag</span><span><i class="lg fresh"></i>Neustart</span><span><i class="lg mile"></i>Meilenstein</span></div>';
     h += '<section class="card" style="padding:4px 16px;gap:0">' + rows + '</section>';
     h += '<p class="xs muted">Tippe auf einen Vorschlag, um ihn mit dem passenden Startdatum einzuplanen. Monatsanfänge und Neujahr eignen sich besonders gut für einen Neustart.</p>';
+    var jw = jsWindow(t), jy = jw ? jsYear(t) : +t.slice(0, 4) + 1, jd = (state.years || {})[jy];
+    h += '<section class="card warm" style="flex-direction:row;align-items:center;gap:14px"><span class="stack" style="gap:2px;flex:1;min-width:0"><span class="eyebrow" style="font-size:11px;color:var(--rt)">Jahresstart ' + jy + '</span><strong>' + (jd && jd.done ? 'Abgeschlossen' : jw ? 'Jetzt zwischen den Jahren' : 'Ab 26. Dezember auf Heute') + '</strong><span class="small" style="color:var(--ink2)">Rückblick, Wort des Jahres, Skizze, Brief an dich</span></span><button class="btn sm warm" data-a="js-open">' + (jw ? 'Öffnen' : 'Vorschau') + '</button></section>';
     return h;
   }
   function seasonHint() { return upcoming(today(), 35).slice(0, 2).map(function (x) { return soonCard(x, true); }).join(''); }
@@ -870,6 +874,202 @@
     return '';
   }
 
+  // ---------- Planen: Umschalter Monat | Jahr | Bucketlist ----------
+  function planSeg(cur) {
+    return '<div class="seg three" role="tablist" aria-label="Ansicht">' + [['monat', 'Monat'], ['jahr', 'Jahr'], ['bucket', 'Bucketlist']].map(function (x) {
+      return '<button role="tab" aria-selected="' + (cur === x[0]) + '" data-a="go" data-v="' + x[0] + '">' + x[1] + '</button>';
+    }).join('') + '</div>';
+  }
+
+  // ---------- Bucketlist ----------
+  var SEASONS = { fruehling: ['Frühling', [3, 4, 5]], sommer: ['Sommer', [6, 7, 8]], herbst: ['Herbst', [9, 10, 11]], winter: ['Winter', [12, 1, 2]] };
+  var AREAS = [['Natur', 'green'], ['Reisen', 'blue'], ['Kreativität', 'violet'], ['Beziehungen', 'orange'], ['Gesundheit', 'red'], ['Lernen', 'blue'], ['Abenteuer', 'orange']];
+  var BIDEAS = ['Polarlichter sehen', 'Einen Marathon laufen', 'Ein Instrument lernen', 'Draußen übernachten', 'Einen Berg besteigen', 'Ein Buch schreiben'];
+  function areaColor(a) { for (var i = 0; i < AREAS.length; i++) if (AREAS[i][0] === a) return color(AREAS[i][1]); return 'var(--ink3)'; }
+  function findB(id) { for (var i = 0; i < state.bucket.length; i++) if (state.bucket[i].id === id) return state.bucket[i]; return null; }
+  function bWhen(b) {
+    if (b.when === 'season' && SEASONS[b.season]) return SEASONS[b.season][0];
+    if (b.when === 'year' && b.year) return String(b.year);
+    return 'irgendwann';
+  }
+  function bMeta(b) { return (b.area ? esc(b.area) + ' · ' : '') + bWhen(b); }
+  function bBadge(b) {
+    if (b.status === 'erlebt') return '<span class="badge ok">Erlebt</span>';
+    if (b.status === 'geplant') return '<span class="badge accent">' + (b.month ? MONTHS[+b.month.slice(5) - 1].slice(0, 3) + ' ' + b.month.slice(2, 4) : b.forYear || 'Geplant') + '</span>';
+    return '<span class="badge">Traum</span>';
+  }
+  function bSoon(t) {
+    var m = +t.slice(5, 7), nextM = m === 12 ? 1 : m + 1;
+    return state.bucket.filter(function (b) { return b.status !== 'erlebt' && b.when === 'season' && SEASONS[b.season] && !b.month && (SEASONS[b.season][1].indexOf(m) >= 0 || SEASONS[b.season][1].indexOf(nextM) >= 0); })[0] || null;
+  }
+  function vBucket() {
+    var t = today(), f = ui.bf || 'alle', all = state.bucket, ny = jsYear(t);
+    var nErl = all.filter(function (b) { return b.status === 'erlebt'; }).length;
+    var h = planSeg('bucket') + '<header class="stack" style="gap:4px">' + eyebrow(all.length + (all.length === 1 ? ' Eintrag' : ' Einträge') + (nErl ? ' · ' + nErl + ' erlebt' : '')) + '<h1>Bucketlist</h1></header>';
+    if (!all.length) {
+      return h + '<section class="card empty"><span class="ic-circle">' + ICON.leaf + '</span><h2>Was willst du erleben?</h2><p class="muted small">Sammle hier Dinge für irgendwann: Reisen, Abenteuer, Projekte. Wenn es passt, holst du sie als Monatsziel in einen Monat.</p><button class="btn primary block" data-a="b-new">Ersten Eintrag anlegen</button></section>';
+    }
+    var soon = bSoon(t);
+    if (soon) h += '<div class="card warm" style="flex-direction:row;align-items:center;gap:14px"><span class="tile" style="background:var(--r);color:var(--onR)"><span style="width:20px;height:20px;display:inline-flex">' + ICON.cal + '</span></span><button class="stack" style="gap:2px;flex:1;min-width:0;background:none;border:none;padding:0;text-align:left;cursor:pointer;color:inherit" data-a="b-open" data-v="' + soon.id + '"><span class="eyebrow" style="font-size:11px;color:var(--rt)">Bald relevant</span><strong>' + esc(soon.title) + '</strong><span class="small" style="color:var(--ink2)">Die Jahreszeit dafür ist jetzt oder bald</span></button></div>';
+    var cnt = { plan: all.filter(function (b) { return b.status === 'geplant'; }).length, traum: all.filter(function (b) { return b.status === 'traum'; }).length };
+    h += '<div class="chips" role="group" aria-label="Filter">' + chip('Alle', 'b-filter', 'alle', f === 'alle') + chip('Geplant · ' + cnt.plan, 'b-filter', 'plan', f === 'plan') + chip('Träume · ' + cnt.traum, 'b-filter', 'traum', f === 'traum') + chip('Erlebt · ' + nErl, 'b-filter', 'erlebt', f === 'erlebt') + '</div>';
+    if (f === 'erlebt') {
+      var er = all.filter(function (b) { return b.status === 'erlebt'; }).sort(function (a, b) { return (a.doneAt || '') < (b.doneAt || '') ? 1 : -1; });
+      if (!er.length) return h + '<p class="muted small">Noch nichts erlebt. Das kommt.</p>' + '<button class="fab" data-a="b-new">' + ICON.plus + 'Eintrag</button>';
+      var lastY = '';
+      er.forEach(function (b, i) {
+        var y = (b.doneAt || '').slice(0, 4);
+        if (y !== lastY) { h += '<h2 style="font-size:26px;padding-top:4px">' + esc(y || 'Ohne Datum') + '</h2>'; lastY = y; }
+        h += '<div class="tl"><span class="rail"><i></i><b' + (i === er.length - 1 ? ' class="end"' : '') + '></b></span><button class="card tl-card" data-a="b-open" data-v="' + b.id + '"><span class="between" style="width:100%"><strong style="font-size:16px">' + esc(b.title) + '</strong><span class="xs muted num">' + (b.doneAt ? fmt(b.doneAt) : '') + '</span></span>' +
+          (b.memory ? '<span class="memo">„' + esc(b.memory) + '“</span>' : '<span class="xs muted">Tippen, um festzuhalten, wie es war</span>') + (b.goalMonth ? '<span class="badge accent" style="align-self:flex-start">Aus den Monatszielen ' + MONTHS[+b.goalMonth.slice(5) - 1] + '</span>' : '') + '</button></div>';
+      });
+      return h + '<button class="fab" data-a="b-new">' + ICON.plus + 'Eintrag</button>';
+    }
+    var list = all.filter(function (b) { return f === 'alle' ? true : f === 'plan' ? b.status === 'geplant' : b.status === 'traum'; });
+    var rank = { geplant: 0, traum: 1, erlebt: 2 };
+    list.sort(function (a, b) { return rank[a.status] - rank[b.status]; });
+    h += '<section class="card" style="padding:4px 16px;gap:0">' + (list.length ? list.map(function (b) {
+      return '<button class="art-row" data-a="b-open" data-v="' + b.id + '"><span class="dot" style="background:' + areaColor(b.area) + '"></span><span class="stack" style="gap:2px;flex:1;min-width:0;text-align:left"><strong style="font-size:15px;line-height:1.3' + (b.status === 'erlebt' ? ';color:var(--ink3);text-decoration:line-through' : '') + '">' + esc(b.title) + '</strong><span class="xs muted">' + bMeta(b) + '</span></span>' + bBadge(b) + '</button>';
+    }).join('') : '<p class="muted small" style="padding:12px 0">Hier ist gerade nichts.</p>') + '</section>';
+    h += '<p class="xs muted">Tipp: Im Jahresstart zwischen den Jahren wählst du drei Einträge fürs neue Jahr aus.</p>';
+    return h + '<button class="fab" data-a="b-new">' + ICON.plus + 'Eintrag</button>';
+  }
+  function vBucketNew() {
+    var f = ui.bform, ty = +today().slice(0, 4);
+    var h = topbar(backBtn('Bucketlist', 'bucket')) + '<header class="stack" style="gap:4px">' + eyebrow('Bucketlist') + '<h1 style="font-size:38px">' + (f.id ? 'Bearbeiten' : 'Neuer Eintrag') + '</h1></header>';
+    h += '<section class="card"><label class="field">Was willst du erleben?<input type="text" id="b-title" data-in="bf" data-k="title" value="' + esc(f.title) + '" placeholder="z.B. Einmal Polarlichter sehen"></label>' +
+      (f.id ? '' : '<div class="chips">' + BIDEAS.slice(0, 4).map(function (x) { return '<button type="button" class="chip dash" data-a="b-idea" data-v="' + esc(x) + '">+ ' + esc(x) + '</button>'; }).join('') + '</div>') + '</section>';
+    h += '<section class="card"><h2>Wann?</h2><div class="chips">' + chip('Irgendwann', 'b-when', 'any', f.when === 'any') + chip('Jahreszeit', 'b-when', 'season', f.when === 'season') + chip('Jahr', 'b-when', 'year', f.when === 'year') + '</div>';
+    if (f.when === 'season') h += '<div class="seg four" role="radiogroup" aria-label="Jahreszeit">' + Object.keys(SEASONS).map(function (k) { return '<button role="radio" aria-selected="' + (f.season === k) + '" data-a="b-season" data-v="' + k + '">' + SEASONS[k][0] + '</button>'; }).join('') + '</div><p class="xs muted">Mit Jahreszeit erinnert dich die App rechtzeitig unter „Bald relevant“.</p>';
+    if (f.when === 'year') h += '<div class="chips">' + [ty, ty + 1, ty + 2, ty + 3].map(function (y) { return chip(String(y), 'b-year', y, +f.year === y); }).join('') + '</div>';
+    h += '</section>';
+    h += '<section class="card"><div class="between"><h2>Bereich</h2><span class="xs muted">optional</span></div><div class="chips">' + AREAS.map(function (a) { return chip('<span class="dot" style="background:' + color(a[1]) + '"></span>' + a[0], 'b-area', a[0], f.area === a[0]); }).join('') + '</div></section>';
+    h += '<section class="card"><label class="field">Notiz<textarea id="b-note" data-in="bf" data-k="note" rows="2" placeholder="Warum, mit wem, erste Ideen">' + esc(f.note) + '</textarea></label></section>';
+    h += '<button class="btn primary block" style="min-height:54px" data-a="b-save">' + (f.id ? 'Speichern' : 'Auf die Bucketlist') + '</button>';
+    return h;
+  }
+  function vBucketItem() {
+    var b = findB(ui.bid); if (!b) { ui.view = 'bucket'; return vBucket(); }
+    var t = today(), k0 = monthKey(t);
+    var h = topbar(backBtn('Bucketlist', 'bucket'), '<button class="icon-btn" data-a="b-edit" data-v="' + b.id + '" aria-label="Bearbeiten">' + ICON.gear + '</button>');
+    h += '<header class="stack" style="gap:6px"><p class="eyebrow num" style="display:flex;align-items:center;gap:8px"><span class="dot" style="background:' + areaColor(b.area) + '"></span>' + bMeta(b) + ' · seit ' + MONTHS[parse(b.created).getMonth()].slice(0, 3) + '. ' + b.created.slice(0, 4) + '</p><h1 style="font-size:38px">' + esc(b.title) + '</h1></header>';
+    h += '<div class="seg three solid" role="radiogroup" aria-label="Status">' + [['traum', 'Traum'], ['geplant', 'Geplant'], ['erlebt', 'Erlebt']].map(function (s) { return '<button role="radio" aria-selected="' + (b.status === s[0]) + '" data-a="b-status" data-v="' + b.id + '|' + s[0] + '">' + s[1] + '</button>'; }).join('') + '</div>';
+    if (b.status === 'erlebt') {
+      h += '<section class="card soft"><span class="eyebrow" style="color:var(--pd)">Erlebt' + (b.doneAt ? ' am ' + fmtY(b.doneAt) : '') + '</span><label class="field" style="color:var(--pd)">Wie war\'s? Ein Satz reicht.<textarea id="b-memo" data-in="bmemo" data-v="' + b.id + '" rows="3" style="background:var(--surf)" placeholder="Was willst du davon nicht vergessen?">' + esc(b.memory || '') + '</textarea></label></section>';
+    } else {
+      var months = []; for (var i = 0; i < 6; i++) months.push(monthShift(k0, i));
+      h += '<section class="card"><h2>Diesen Monat angehen</h2><p class="small" style="color:var(--ink2)">Landet als Monatsziel im gewählten Monat. Hakst du es dort ab, ist es hier erlebt.</p><div class="chips">' +
+        months.map(function (k) { return chip(MONTHS[+k.slice(5) - 1].slice(0, 3) + (k.slice(0, 4) !== k0.slice(0, 4) ? ' ' + k.slice(2, 4) : ''), 'b-month', b.id + '|' + k, b.month === k); }).join('') + '</div>' +
+        (b.month ? '<button class="btn ghost sm" style="align-self:flex-start;margin-left:-8px" data-a="b-month-go" data-v="' + b.month + '">Zum ' + MONTHS[+b.month.slice(5) - 1] + '</button>' : '') + '</section>';
+      h += '<section class="card"><h2>Darauf hinarbeiten</h2><p class="small" style="color:var(--ink2)">Eine Challenge, die dich näher bringt, zum Beispiel jede Woche ein Schritt zur Reise oder täglich etwas zurücklegen.</p><div class="row"><button class="btn sm primary" data-a="b-challenge" data-v="' + b.id + '">' + ICON.plus + 'Challenge dazu</button><button class="btn sm" data-a="tpl" data-v="sparen">Täglich sparen</button></div></section>';
+    }
+    h += '<section class="card"><label class="field">Notiz<textarea id="b-n2" data-in="bnote" data-v="' + b.id + '" rows="2" placeholder="Warum, mit wem, Ideen">' + esc(b.note || '') + '</textarea></label></section>';
+    if (b.status !== 'erlebt') h += '<button class="btn block" data-a="b-status" data-v="' + b.id + '|erlebt">' + ICON.check + 'Als erlebt markieren</button>';
+    if (ui.confirm === 'bdel-' + b.id) h += '<section class="card warm"><strong>„' + esc(b.title) + '“ löschen?</strong><div class="row"><button class="btn sm danger" data-a="b-del" data-v="' + b.id + '">Löschen</button><button class="btn sm" data-a="cancel">Abbrechen</button></div></section>';
+    else h += '<button class="btn ghost danger" style="align-self:center" data-a="ask" data-v="bdel-' + b.id + '">Eintrag löschen</button>';
+    return h;
+  }
+
+  // ---------- Jahresstart ----------
+  function jsYear(t) { var y = +t.slice(0, 4), m = +t.slice(5, 7); return m === 12 ? y + 1 : y; }
+  function jsWindow(t) { var m = +t.slice(5, 7), d = +t.slice(8, 10); return (m === 12 && d >= 26) || (m === 1 && d <= 6); }
+  function yd(Y) { state.years = state.years || {}; return state.years[Y] || (state.years[Y] = { word: '', q1: '', q2: '', q3: '', letter: '', picks: [], done: false, dismissed: false, step: 1 }); }
+  function yearStats(y) {
+    var ys = y + '-01-01', ye = y + '-12-31', t = today(), upto = ye < t ? ye : t;
+    var started = state.challenges.filter(function (c) { return c.start >= ys && c.start <= ye; });
+    var finished = started.filter(function (c) { return c.status === 'done' || chEnd(c) < t; });
+    var gTot = 0, gDone = 0; Object.keys(state.months).forEach(function (k) { if (k.slice(0, 4) === String(y)) { var g = state.months[k].goals || []; gTot += g.length; gDone += g.filter(function (x) { return x.done; }).length; } });
+    var per = []; for (var i = 0; i < 12; i++) per.push(0);
+    state.challenges.forEach(function (c) { var m = state.checkins[c.id] || {}; Object.keys(m).forEach(function (d) { if (d.slice(0, 4) === String(y) && isDone(c, d)) per[+d.slice(5, 7) - 1]++; }); });
+    var run = 0, best = 0; if (upto >= ys) for (var d = ys; d <= upto; d = addDays(d, 1)) { if (activeOn(d)) { run++; if (run > best) best = run; } else run = 0; }
+    var rv2 = reviewed().filter(function (c) { return c.review.at.slice(0, 4) === String(y); });
+    var bl = state.bucket.filter(function (b) { return b.status === 'erlebt' && (b.doneAt || '').slice(0, 4) === String(y); });
+    var max = Math.max.apply(null, per), bestM = max > 0 ? per.indexOf(max) : -1;
+    return { started: started.length, finished: finished.length, gTot: gTot, gDone: gDone, per: per, max: max, bestM: bestM, best: best, help: topOf(rv2, 'helped') || topOf2(rv2, 'helped'), hard: topOf(rv2, 'hard') || topOf2(rv2, 'hard'), bl: bl };
+  }
+  function topOf2(list, key) { var cnt = {}; list.forEach(function (c) { (c.review[key] || []).forEach(function (x) { cnt[x] = (cnt[x] || 0) + 1; }); }); var b = null; Object.keys(cnt).forEach(function (k) { if (!b || cnt[k] > cnt[b]) b = k; }); return b ? [b, cnt[b]] : null; }
+  function jsCard(t) {
+    var Y = jsYear(t), y = state.years && state.years[Y];
+    if (!jsWindow(t) || (y && (y.done || y.dismissed))) return '';
+    var started = y && y.step > 1;
+    return '<section class="card warm js-card"><span class="eyebrow" style="color:var(--rt)">Zwischen den Jahren · bis 6. Januar</span><span class="js-title">Dein Jahresstart ' + Y + '</span><p class="small" style="color:var(--ink2);line-height:1.5">Ein ruhiger Blick zurück und nach vorn. Vier Schritte, etwa 15 Minuten. Du kannst jederzeit pausieren.</p>' +
+      '<ol class="steps js-steps">' + ['Dein Jahr ' + (Y - 1), 'Wort des Jahres', 'Das Jahr skizzieren', 'Brief an dich'].map(function (s, i) { return '<li><span class="n">' + (i + 1) + '</span>' + s + '</li>'; }).join('') + '</ol>' +
+      '<button class="btn warm block" data-a="js-open">' + (started ? 'Weitermachen' : 'Jahresstart beginnen') + '</button><button class="btn ghost" style="color:var(--rt)" data-a="js-dismiss">Nicht dieses Jahr</button></section>';
+  }
+  function letterCard(t) {
+    var y = +t.slice(0, 4), yy = state.years && state.years[y];
+    if (!yy || !yy.letter || t < y + '-12-31' || yy.letterRead) return '';
+    return '<button class="card warm js-card" data-a="go" data-v="brief" style="text-align:left;cursor:pointer;color:inherit"><span class="eyebrow" style="color:var(--rt)">Heute öffnet sich</span><span class="js-title">Dein Brief an dich</span><span class="small" style="color:var(--ink2)">Geschrieben zum Jahresstart ' + y + '</span></button>';
+  }
+  function vBrief() {
+    var y = +today().slice(0, 4), yy = (state.years || {})[y] || {};
+    yy.letterRead = true; save();
+    return topbar(backBtn('Heute', 'heute')) + '<header class="stack" style="gap:4px">' + eyebrow('Jahresstart ' + y) + '<h1 style="font-size:38px">Dein Brief</h1></header>' +
+      '<section class="card"><span class="letter-h">Liebes Ich im Dezember ' + y + ',</span><p class="letter share-pre">' + esc(yy.letter || '') + '</p></section>' +
+      (yy.word ? '<p class="small muted">Dein Wort für ' + y + ' war <strong style="color:var(--ink)">' + esc(yy.word) + '</strong>.</p>' : '');
+  }
+  var JS_WORDS = ['Ruhe', 'Mut', 'Fokus', 'Leichtigkeit', 'Neugier', 'Wachstum', 'Draußen'];
+  function jsHead(step, back) {
+    var p = ''; for (var i = 1; i <= 4; i++) p += '<i class="' + (i <= step ? 'on' : '') + '"></i>';
+    return '<div class="row" style="gap:8px"><button class="icon-btn" style="border:none;background:none;margin-left:-12px" aria-label="Zurück" data-a="' + (back ? 'js-prev' : 'go') + '" data-v="' + (back ? '' : 'heute') + '">' + ICON.back + '</button><div class="prog" aria-label="Schritt ' + step + ' von 4">' + p + '</div><span class="small muted num" style="font-weight:600">' + step + ' / 4</span></div>';
+  }
+  function vJs() {
+    var Y = ui.jsY, y = yd(Y), s = ui.jsStep || 1, h = '';
+    var foot = function (next, skip) { return '<div class="grid-foot">' + (skip ? '<button class="btn" data-a="js-next">Überspringen</button>' : '') + '<button class="btn primary" data-a="js-next"' + (skip ? '' : ' style="grid-column:1 / -1"') + '>' + next + '</button></div>'; };
+    if (s === 1) {
+      var st = yearStats(Y - 1), bars = '';
+      for (var i = 0; i < 12; i++) bars += '<span style="height:' + Math.max(5, st.max ? st.per[i] / st.max * 100 : 5).toFixed(0) + '%' + (i === st.bestM ? ';background:var(--p)' : '') + '"></span>';
+      h += jsHead(1, false) + '<header class="stack" style="gap:6px">' + eyebrow('Rückblick') + '<h1 style="font-size:40px">Dein Jahr ' + (Y - 1) + '</h1><p class="small muted">Aus deinen Check-ins, Monatszielen und Rückblicken.</p></header>';
+      h += '<section class="grid2"><div class="card tight"><span class="stat">' + st.started + '</span><span class="xs muted">Challenges gestartet</span></div><div class="card tight"><span class="stat">' + st.finished + '</span><span class="xs muted">davon beendet</span></div>' +
+        '<div class="card tight warm"><span class="stat" style="color:var(--rt)">' + st.best + '</span><span class="xs muted">Tage längste Serie</span></div><div class="card tight"><span class="stat">' + st.gDone + '<small class="muted" style="font-size:15px"> / ' + st.gTot + '</small></span><span class="xs muted">Monatsziele erreicht</span></div></section>';
+      h += '<section class="card"><div class="between"><strong>Check-ins pro Monat</strong>' + (st.bestM >= 0 ? '<span class="xs muted">Bester Monat: ' + MONTHS[st.bestM] + '</span>' : '') + '</div>' + (st.max ? '<div class="ybars">' + bars + '</div><div class="ymos">' + MONTHS.map(function (m) { return '<span>' + m.charAt(0) + '</span>'; }).join('') + '</div>' : '<p class="small muted">In diesem Jahr gibt es noch keine Check-ins.</p>') + '</section>';
+      if (st.help || st.hard) h += '<section class="card ink"><span class="eyebrow">Dein Muster ' + (Y - 1) + '</span><p style="font-size:16px;line-height:1.5">' + (st.help ? 'Am meisten geholfen hat dir <strong>' + esc(st.help[0]) + '</strong>. ' : '') + (st.hard ? 'Schwer war oft <strong>' + esc(st.hard[0]) + '</strong>.' : '') + '</p></section>';
+      if (st.bl.length) h += '<section class="card" style="flex-direction:row;align-items:center;gap:14px"><span class="tile"><span style="width:20px;height:20px;display:inline-flex">' + ICON.trophy + '</span></span><span class="stack" style="gap:2px;flex:1;min-width:0"><strong>' + st.bl.length + ' Bucketlist-' + (st.bl.length === 1 ? 'Eintrag' : 'Einträge') + ' erlebt</strong><span class="xs muted">' + esc(st.bl.slice(0, 3).map(function (b) { return b.title; }).join(', ')) + '</span></span></section>';
+      h += '<h2 style="padding-top:6px">Drei Fragen</h2><section class="card" style="gap:16px">' + [['q1', 'Was war richtig gut?', 'Momente, Menschen, Gewohnheiten'], ['q2', 'Was lasse ich los?', 'Gewohnheiten, Erwartungen, Sorgen'], ['q3', 'Worauf bin ich stolz?', 'Auch Kleines zählt']].map(function (q, i) {
+        return '<label class="field js-q"' + (i ? ' style="padding-top:14px;border-top:1px solid var(--line)"' : '') + '>' + q[1] + '<textarea id="js-' + q[0] + '" data-in="js" data-k="' + q[0] + '" rows="2" placeholder="' + q[2] + '">' + esc(y[q[0]]) + '</textarea></label>';
+      }).join('') + '</section>' + foot('Weiter', false);
+    } else if (s === 2) {
+      h += jsHead(2, true) + '<header class="stack" style="gap:6px">' + eyebrow('Nach vorn') + '<h1 style="font-size:40px">Ein Wort für ' + Y + '</h1><p class="small muted">Eine Überschrift fürs Jahr. Kein Ziel, eher eine Richtung.</p></header>';
+      h += '<section class="card soft" style="align-items:center;padding:28px 20px;gap:8px"><label class="eyebrow" for="js-word" style="color:var(--pd)">Dein Wort</label><input type="text" class="word-in" id="js-word" data-in="js" data-k="word" value="' + esc(y.word) + '" placeholder="…" autocomplete="off"></section>';
+      h += '<div class="stack" style="gap:8px">' + eyebrow('Ideen') + '<div class="chips">' + JS_WORDS.map(function (w) { return '<button class="chip dash" data-a="js-word" data-v="' + w + '">' + w + '</button>'; }).join('') + '</div></div>';
+      h += '<div class="stack" style="gap:8px">' + eyebrow('So erscheint es auf Heute') + '<div class="card tight"><span class="xs" style="font-weight:700;letter-spacing:1.8px;color:var(--ink3)">FREITAG, 1. JANUAR · <span id="js-word-prev" style="color:var(--rt)">' + esc((y.word || 'DEIN WORT').toUpperCase()) + '</span></span><span style="font-family:var(--f-display);font-size:40px;font-weight:600;line-height:1.05">Heute</span></div></div>';
+      h += foot('Weiter', true);
+    } else if (s === 3) {
+      var open = state.bucket.filter(function (b) { return b.status !== 'erlebt'; });
+      h += jsHead(3, true) + '<header class="stack" style="gap:6px">' + eyebrow('Nach vorn') + '<h1 style="font-size:40px">Das Jahr skizzieren</h1><p class="small muted">Grob reicht. Alles lässt sich später im Jahresplaner ändern.</p></header>';
+      h += '<section class="card" style="gap:4px"><div class="between" style="margin-bottom:6px"><h2 style="font-size:22px">Drei für ' + Y + '</h2><span class="xs muted">aus deiner Bucketlist · ' + y.picks.length + ' von 3</span></div>';
+      if (!open.length) h += '<p class="small muted">Deine Bucketlist ist noch leer.</p><button class="btn sm" style="align-self:flex-start" data-a="b-new">' + ICON.plus + 'Eintrag anlegen</button>';
+      h += open.slice(0, 8).map(function (b) { var on = y.picks.indexOf(b.id) >= 0; return '<div class="list-item"><button class="box" aria-pressed="' + on + '" aria-label="' + esc(b.title) + ' für ' + Y + ' wählen" data-a="js-pick" data-v="' + b.id + '">' + (on ? ICON.check : '') + '</button><span style="flex:1">' + esc(b.title) + '</span><span class="xs muted">' + bWhen(b) + '</span></div>'; }).join('') + '</section>';
+      var rows = '';
+      for (var mo = 1; mo <= 12; mo++) {
+        var k = Y + '-' + pad(mo), ms = k + '-01', me = k + '-' + pad(monthLen(k));
+        var mine = state.challenges.filter(function (c) { return c.start <= me && chEnd(c) >= ms && c.status !== 'stopped'; });
+        var chips2 = mine.map(function (c) { return '<button class="ychip plan" data-a="open-detail" data-v="' + c.id + '">' + esc(c.name) + '</button>'; }).join('');
+        chips2 += state.bucket.filter(function (b) { return y.picks.indexOf(b.id) >= 0 && b.when === 'season' && SEASONS[b.season] && SEASONS[b.season][1][0] === mo; }).map(function (b) { return '<span class="ychip bl">' + esc(b.title) + '</span>'; }).join('');
+        chips2 += state.bucket.filter(function (b) { return b.month === k; }).map(function (b) { return '<span class="ychip bl">' + esc(b.title) + '</span>'; }).join('');
+        var sug = TEMPLATES.filter(function (tp) { var st0 = startIn(tp, Y); return st0 && st0.slice(0, 7) === k && !mine.some(function (c) { return c.name === tp.name; }); }).slice(0, 2);
+        chips2 += sug.map(function (tp) { return '<button class="ychip sug" data-a="tpl-at" data-v="' + tp.id + '|' + startIn(tp, Y) + '">+ ' + esc(tp.name) + '</button>'; }).join('');
+        if (!chips2) continue;
+        rows += '<div class="yrow"><div class="ymonth"><span>' + MONTHS[mo - 1].slice(0, 3) + '</span></div><div class="ychips">' + chips2 + '</div></div>';
+      }
+      h += '<section class="card" style="padding:4px 16px;gap:0">' + (rows || '<p class="small muted" style="padding:12px 0">Noch nichts geplant.</p>') + '</section>';
+      h += '<div class="ylegend"><span><i class="lg plan"></i>Geplant</span><span><i class="lg blk"></i>Bucketlist</span><span><i class="lg sug"></i>Vorschlag</span></div>';
+      h += foot('Weiter', true);
+    } else {
+      var picks = state.bucket.filter(function (b) { return y.picks.indexOf(b.id) >= 0; });
+      var first = state.challenges.filter(function (c) { return c.start >= Y + '-01-01' && c.start <= Y + '-01-31'; }).sort(function (a, b) { return a.start < b.start ? -1 : 1; })[0];
+      h += jsHead(4, true) + '<header class="stack" style="gap:6px">' + eyebrow('Zum Schluss') + '<h1 style="font-size:40px">Ein Brief an dich</h1><p class="small muted">Er bleibt verschlossen und öffnet sich am 31. Dezember ' + Y + '.</p></header>';
+      h += '<section class="card"><label class="letter-h" for="js-letter">Liebes Ich im Dezember ' + Y + ',</label><textarea class="letter-in" id="js-letter" data-in="js" data-k="letter" rows="6" placeholder="Was wünschst du dir? Was willst du dir sagen?">' + esc(y.letter) + '</textarea><span class="row xs muted" style="gap:8px"><span style="width:16px;height:16px;display:inline-flex">' + ICON.shield + '</span>Danach bis zum 31.12. nicht mehr lesbar, auch nicht für dich</span></section>';
+      h += '<section class="card warm" style="gap:0"><span class="eyebrow" style="color:var(--rt);margin-bottom:10px">Dein ' + Y + '</span>' +
+        '<div class="sum"><span>Wort</span><span>' + (y.word ? '<span style="font-family:var(--f-display);font-size:18px">' + esc(y.word) + '</span>' : '<span class="muted">offen</span>') + '</span></div>' +
+        '<div class="sum"><span>Bucketlist</span><span>' + (picks.length ? esc(picks.map(function (b) { return b.title; }).join(', ')) : '<span class="muted">keine gewählt</span>') + '</span></div>' +
+        '<div class="sum"><span>Erste Challenge</span><span>' + (first ? esc(first.name) + ' ab ' + fmt(first.start) : '<span class="muted">noch keine im Januar</span>') + '</span></div>' +
+        '<div class="sum"><span>Zeitraum</span><span>' + Y + ' · Tag 1 von ' + (diff(Y + '-01-01', Y + '-12-31') + 1) + '</span></div></section>';
+      h += '<button class="btn warm block" style="min-height:56px" data-a="js-finish">Jahr starten</button>';
+    }
+    return h;
+  }
+
   function shareText() {
     var s = ui.share, t = today(), lines = [];
     var per = state.periods.filter(function (p) { return p.start <= t && p.end >= t; })[0];
@@ -1042,6 +1242,52 @@
     'note-open': function (id) { ui.openNote[id] = true; render(); var el = document.getElementById('note-' + id); if (el) el.focus(); },
     'note-close': function (id) { ui.openNote[id] = false; render(); },
     'open-detail': function (id) { ui.detailId = id; ui.back = ui.view === 'monat' ? 'monat' : 'heute'; go('detail'); },
+    'b-new': function () { ui.bform = { id: null, title: '', when: 'any', season: '', year: '', area: '', note: '' }; go('bnew'); },
+    'b-edit': function (id) { var b = findB(id); ui.bform = { id: b.id, title: b.title, when: b.when, season: b.season || '', year: b.year || '', area: b.area || '', note: b.note || '' }; go('bnew'); },
+    'b-idea': function (v) { ui.bform.title = v; render(); },
+    'b-when': function (v) { ui.bform.when = v; render(); },
+    'b-season': function (v) { ui.bform.season = v; render(); },
+    'b-year': function (v) { ui.bform.year = +v; render(); },
+    'b-area': function (v) { ui.bform.area = ui.bform.area === v ? '' : v; render(); },
+    'b-save': function () {
+      var f = ui.bform, ti = String(f.title || '').trim(); if (!ti) { var el = document.getElementById('b-title'); if (el) el.focus(); return; }
+      if (f.when === 'season' && !f.season) f.when = 'any';
+      if (f.when === 'year' && !f.year) f.when = 'any';
+      if (f.id) { var b = findB(f.id); ['when', 'season', 'year', 'area', 'note'].forEach(function (k) { b[k] = f[k]; }); b.title = ti; save(); toast('Gespeichert'); ui.bid = b.id; go('bitem'); }
+      else { state.bucket.push({ id: uid(), title: ti, when: f.when, season: f.season, year: f.year, area: f.area, note: f.note, status: 'traum', created: today(), month: null, goalId: null, doneAt: null, memory: '' }); save(); toast('Auf der Bucketlist', ti); ui.bf = 'alle'; go('bucket'); }
+    },
+    'b-open': function (id) { ui.bid = id; go('bitem'); },
+    'b-filter': function (v) { ui.bf = v; render(); },
+    'b-status': function (v) {
+      var p = v.split('|'), b = findB(p[0]), was = b.status; b.status = p[1];
+      var g = null; if (b.month && b.goalId) (monthData(b.month).goals || []).forEach(function (x) { if (x.id === b.goalId) g = x; });
+      if (p[1] === 'erlebt' && was !== 'erlebt') { b.doneAt = today(); if (g) { g.done = true; b.goalMonth = b.month; } toast('Erlebt', 'Halte fest, wie es war.'); }
+      if (p[1] !== 'erlebt' && was === 'erlebt') { b.doneAt = null; if (g) g.done = false; }
+      commit();
+    },
+    'b-month': function (v) {
+      var p = v.split('|'), b = findB(p[0]), k = p[1];
+      if (b.month && b.goalId) { var om = monthData(b.month); om.goals = om.goals.filter(function (x) { return x.id !== b.goalId; }); }
+      if (b.month === k) { b.month = null; b.goalId = null; commit(); return; }
+      var g = { id: uid(), text: b.title, done: false, bucketId: b.id }; monthData(k).goals.push(g);
+      b.month = k; b.goalId = g.id; if (b.status === 'traum') b.status = 'geplant';
+      commit(); toast('Als Monatsziel geplant', MONTHS[+k.slice(5) - 1] + ' ' + k.slice(0, 4));
+    },
+    'b-month-go': function (k) { ui.month = k; go('monat'); },
+    'b-challenge': function (id) { var b = findB(id); ui.form = newForm(null); ui.form.name = b.title; go('setup'); },
+    'b-del': function (id) { var b = findB(id); if (b.month && b.goalId) { var om = monthData(b.month); om.goals = om.goals.filter(function (x) { return x.id !== b.goalId; }); } state.bucket = state.bucket.filter(function (x) { return x.id !== id; }); ui.confirm = null; save(); toast('Eintrag gelöscht'); go('bucket'); },
+    'js-open': function () { var t = today(); ui.jsY = jsWindow(t) ? jsYear(t) : +t.slice(0, 4) + 1; ui.jsStep = yd(ui.jsY).step || 1; go('js'); },
+    'js-next': function () { ui.jsStep = Math.min(4, (ui.jsStep || 1) + 1); yd(ui.jsY).step = ui.jsStep; save(); window.scrollTo(0, 0); render(); },
+    'js-prev': function () { ui.jsStep = Math.max(1, (ui.jsStep || 1) - 1); yd(ui.jsY).step = ui.jsStep; save(); window.scrollTo(0, 0); render(); },
+    'js-word': function (v) { yd(ui.jsY).word = v; save(); render(); },
+    'js-pick': function (id) { var y = yd(ui.jsY), i = y.picks.indexOf(id); if (i >= 0) y.picks.splice(i, 1); else if (y.picks.length >= 3) { toast('Höchstens drei', 'Weniger ist hier mehr.'); return; } else y.picks.push(id); commit(); },
+    'js-dismiss': function () { yd(jsYear(today())).dismissed = true; commit(); toast('Ausgeblendet', 'Du findest den Jahresstart im Jahresplaner.'); },
+    'js-finish': function () {
+      var Y = ui.jsY, y = yd(Y); y.done = true; y.step = 4;
+      state.bucket.forEach(function (b) { if (y.picks.indexOf(b.id) >= 0 && b.status !== 'erlebt') { b.status = 'geplant'; b.forYear = Y; } });
+      if (!state.periods.some(function (p) { return p.start === Y + '-01-01' && p.end === Y + '-12-31'; })) state.periods.push({ id: uid(), name: 'Jahr ' + Y, start: Y + '-01-01', end: Y + '-12-31' });
+      save(); toast('Dein ' + Y + ' ist angelegt', y.letter ? 'Der Brief öffnet sich am 31. Dezember.' : 'Viel Freude damit.'); go('heute');
+    },
     'open-review': function (id) { ui.rvBack = ['tagebuch', 'setup', 'heute'].indexOf(ui.view) >= 0 ? ui.view : 'detail'; ui.detailId = id; go('rueckblick'); },
     'rv-rate': function (v) { var p = v.split('|'), r = rv(findCh(p[0])); r.rating = r.rating === +p[1] ? 0 : +p[1]; commit(); },
     'rv-help': function (v) { var p = v.split('|'), r = rv(findCh(p[0])), i = r.helped.indexOf(p[1]); if (i >= 0) r.helped.splice(i, 1); else r.helped.push(p[1]); commit(); },
@@ -1062,8 +1308,8 @@
     month: function (n) { ui.month = monthShift(ui.month, +n); render(); },
     'month-now': function () { ui.month = monthKey(today()); render(); },
     'plan-month': function () { var t = today(), k = ui.month; ui.planFor = k > monthKey(t) ? k + '-01' : null; go('bibliothek'); },
-    goal: function (id) { var md = monthData(ui.month), was = md.goals.every(function (g) { return g.done; }); md.goals.forEach(function (g) { if (g.id === id) g.done = !g.done; }); save(); if (!was && md.goals.length && md.goals.every(function (g) { return g.done; })) toast('Alle Monatsziele erreicht', 'Was für ein Monat.'); render(); },
-    'goal-del': function (id) { var md = monthData(ui.month); md.goals = md.goals.filter(function (g) { return g.id !== id; }); commit(); },
+    goal: function (id) { var md = monthData(ui.month), was = md.goals.every(function (g) { return g.done; }); md.goals.forEach(function (g) { if (g.id === id) { g.done = !g.done; var bb = g.bucketId && findB(g.bucketId); if (bb) { if (g.done) { bb.status = 'erlebt'; bb.doneAt = today(); bb.goalMonth = ui.month; toast('Von der Bucketlist erlebt', bb.title); } else { bb.status = 'geplant'; bb.doneAt = null; } } } }); save(); if (!was && md.goals.length && md.goals.every(function (g) { return g.done; })) toast('Alle Monatsziele erreicht', 'Was für ein Monat.'); render(); },
+    'goal-del': function (id) { var md = monthData(ui.month); md.goals.forEach(function (g) { var bb = g.id === id && g.bucketId && findB(g.bucketId); if (bb) { bb.month = null; bb.goalId = null; } }); md.goals = md.goals.filter(function (g) { return g.id !== id; }); commit(); },
     'share-month': function () { openShare({ tpl: 'monat', month: ui.month, back: 'monat' }); },
     lib: function (v) {
       ui.lib = v; ui.q = '';
@@ -1149,6 +1395,9 @@
       return;
     }
     if (k === 'share') { ui.share.text = v; return; }
+    if (k === 'bf') { ui.bform[el.getAttribute('data-k')] = v; return; }
+    if (k === 'bmemo' || k === 'bnote') { findB(el.getAttribute('data-v'))[k === 'bmemo' ? 'memory' : 'note'] = v; clearTimeout(inputTimer); inputTimer = setTimeout(save, 400); return; }
+    if (k === 'js') { var kk = el.getAttribute('data-k'); yd(ui.jsY)[kk] = v; if (kk === 'word') { var pv = document.getElementById('js-word-prev'); if (pv) pv.textContent = (v || 'DEIN WORT').toUpperCase(); } clearTimeout(inputTimer); inputTimer = setTimeout(save, 400); return; }
     if (k === 'wq') { ui.wq = v; var wr = document.getElementById('w-results'); if (wr) wr.innerHTML = wResults(); var wc = document.getElementById('w-chips'); if (wc) { var wsl = wc.scrollLeft; wc.innerHTML = wTopics(); wc.scrollLeft = wsl; } return; }
     if (k === 'rv') { rv(findCh(el.getAttribute('data-v')))[el.getAttribute('data-k')] = v; clearTimeout(inputTimer); inputTimer = setTimeout(save, 400); return; }
     if (k === 'note') setCi(findCh(el.getAttribute('data-v')), today(), { note: v });

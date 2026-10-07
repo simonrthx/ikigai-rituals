@@ -1,7 +1,7 @@
 /* Service Worker: Offline-Cache und Benachrichtigungen.
    Bei jeder Änderung an den App-Dateien VERSION erhöhen, damit Geräte die neue Version laden. */
-var VERSION = 'ikigai-rituals-v11';
-var LABEL = '0.11';
+var VERSION = 'ikigai-rituals-v12';
+var LABEL = '0.12';
 var SHELL = ['./', 'index.html', 'styles.css', 'app.js', 'config.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
 
 // OneSignal-Push (nur aktiv, wenn in config.js eine App-ID eingetragen ist; schadet sonst nicht)
